@@ -1,6 +1,7 @@
 import pygame
 from sys import exit
 
+
 class Game:
     def __init__(self):
         pygame.init()
