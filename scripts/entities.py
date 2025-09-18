@@ -1,11 +1,19 @@
 import pygame
 
-class Player:
-    def __init__(self,game,pos):
-        self.image = game.assets['player']
+class Entity:
+    def __init__(self,game,pos,image_key):
+        self.image = game.assets[image_key]
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect(center=pos)
         self.game = game
+    
+    def render(self,screen):
+        screen.blit(self.image,self.rect)
+
+
+class Player(Entity):
+    def __init__(self,game,pos):
+        super().__init__(game, pos, 'player')
         self.speed = 5
 
     def update(self,movement):
@@ -23,11 +31,10 @@ class Player:
         if self.rect.bottom > display_h:
             self.rect.bottom = display_h
 
-    def render(self,screen):
-        screen.blit(self.image,self.rect)
-    
+
     
 
-"""
-Use this file to implement the player class!
-"""
+class Enemy(Entity):
+    def __init__(self,game,pos):
+        super().__init__(game, pos, 'enemy')
+
