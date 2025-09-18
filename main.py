@@ -1,7 +1,9 @@
 import pygame
 from sys import exit
 from scripts.utils import load_image,load_images
-from scripts.entities import Player, Enemy
+from scripts.enemy import Enemy
+from scripts.player import Player
+from scripts.enums import GameState
 
 
 class Game:
@@ -10,7 +12,7 @@ class Game:
         self.screen = pygame.display.set_mode((1280,720))
         self.display = pygame.Surface((320,180))
         self.clock = pygame.time.Clock()
-        self.gamemode = 'running'
+        self.gamemode = GameState.GAME_RUNNING
         self.assets = {
             'player': load_image('player.png',alpha=True),
             'enemy': load_image('enemy.png',alpha=True)
@@ -21,7 +23,7 @@ class Game:
         self.player = Player(self, (self.display.get_width() // 2, self.display.get_height() // 2))
         movement = [[0,0],[0,0]]  # [[left,right],[up,down]]
         EnemyList = [Enemy(self, (100,100)),Enemy(self, (200,150)),Enemy(self, (150,50))]
-        while self.gamemode == 'running':
+        while self.gamemode == GameState.GAME_RUNNING:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -58,7 +60,7 @@ class Game:
 
     def run(self):
         while True:
-            if self.gamemode == 'running':
+            if self.gamemode == GameState.GAME_RUNNING:
                 self.running()
 
 if __name__ == '__main__':

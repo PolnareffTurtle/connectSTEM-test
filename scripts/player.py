@@ -1,11 +1,9 @@
 import pygame
+from scripts.entities import Entity
 
-class Player:
+class Player(Entity):
     def __init__(self,game,pos):
-        self.image = game.assets['player']
-        self.mask = pygame.mask.from_surface(self.image)
-        self.rect = self.image.get_rect(center=pos)
-        self.game = game
+        super().__init__(game, pos, 'player')
         self.speed = 5
 
     def update(self,movement):
@@ -22,12 +20,3 @@ class Player:
             self.rect.top = 0
         if self.rect.bottom > display_h:
             self.rect.bottom = display_h
-
-    def render(self,screen):
-        screen.blit(self.image,self.rect)
-    
-    
-
-"""
-Use this file to implement the player class!
-"""

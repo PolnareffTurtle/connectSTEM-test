@@ -1,16 +1,6 @@
 import pygame
+from scripts.entities import Entity
 
-class Enemy:
+class Enemy(Entity):
     def __init__(self,game,pos):
-        self.image = game.assets['enemy']
-        self.mask = pygame.mask.from_surface(self.image)
-        self.rect = self.image.get_rect(center=pos)
-        self.game = game
-    
-    def render(self,screen):
-        screen.blit(self.image,self.rect)
-
-
-"""
-Implement the enemy class here!
-"""
+        super().__init__(game, pos, 'enemy')
