@@ -24,6 +24,8 @@ class Game:
         movement = [[0,0],[0,0]]  # [[left,right],[up,down]]
         EnemyList = [Enemy(self, (100,100)),Enemy(self, (200,150)),Enemy(self, (150,50)), Enemy(self)]
         while self.gamemode == GameState.GAME_RUNNING:
+
+            ### INPUTS ###
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -47,7 +49,11 @@ class Game:
                         movement[1][0] = 0
                     if event.key in [pygame.K_DOWN,pygame.K_s]:
                         movement[1][1] = 0
-
+            ### UPDATES ###
+            delta_time = self.clock.get_time() / 16.666 #16.666ms is 60fps
+            for enemy in EnemyList:
+                enemy.update(delta_time)
+            ### RENDERING ###
             self.display.fill('aquamarine')
             self.player.update([movement[0][1]-movement[0][0],movement[1][1]-movement[1][0]])
             self.player.render(self.display)

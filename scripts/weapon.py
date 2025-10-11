@@ -1,19 +1,13 @@
 import pygame
 from enum import Enum
+from scripts import enums
 def circle_attack(atk_power):
     pass
 
 # This isn't limited to traditional "weapons" 
 # but instead is a classifier for how the entity attacks
-
-class WeaponType(Enum):
-    CIRCLE = 'circle',
-    PROJECTILE = 'projectile',
-    LUNGE = 'lunge',
-    NONE = 'none'
-
 class Weapon:
-    def __init__(self,attack_power,attack_speed,attack_size = 1,type:WeaponType = WeaponType.NONE):
+    def __init__(self,attack_power,attack_speed,attack_size = 1,type = enums.WeaponType.NONE):
         self.attack_power = attack_power
         self.attack_speed = attack_speed
         self.attack_size = attack_size 
@@ -28,6 +22,8 @@ class Weapon:
         pass
 
     def use(self, user, direction):
+        if self.cooldown > 0:
+            return
         match self.type:
             case 'circle':
                 circle_attack(self.attack_power, self.attack_size)
@@ -42,6 +38,7 @@ class Weapon:
 
     def lunge_attack(self, user, direction):
         user.velocity = direction * self.attack_power
-        cooldown = 10 / self.attack_speed
+        print("lunger")
+        cooldown = 10
         pass
 
