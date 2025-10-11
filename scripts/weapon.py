@@ -1,6 +1,7 @@
 import pygame
 from enum import Enum
 from scripts import enums
+import random
 def circle_attack(atk_power):
     pass
 
@@ -16,7 +17,7 @@ class Weapon:
 
     def update(self, delta_time):
         if self.cooldown > 0:
-            self.cooldown -= delta_time
+            self.cooldown -= delta_time * random.uniform(0.8,1.2)
         if self.cooldown < 0:
             self.cooldown = 0
         pass
@@ -38,7 +39,6 @@ class Weapon:
 
     def lunge_attack(self, user, direction):
         user.velocity = direction * self.attack_power
-        print("lunger")
-        cooldown = 10
+        self.cooldown = 40/self.attack_speed
         pass
 

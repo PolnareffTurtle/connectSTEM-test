@@ -2,7 +2,7 @@ import pygame
 from scripts.entities import Entity
 import random
 
-range = 50
+range = 100
 class Enemy(Entity):
     def __init__(self,game, pos = None, image_key='enemy', target:Entity = None):
         super().__init__(game, 
@@ -10,9 +10,10 @@ class Enemy(Entity):
                          (random.randint(10, game.display.get_width()-10), 
                           random.randint(10, game.display.get_height()-10)), 
                           image_key,
+                          atk=5,
                           WeaponType= 'lunge'
                           )
-        self.set_friction(5)
+        self.set_friction(0.5)
         self.target = target if target != None else game.player
         
     def update(self, delta_time):
