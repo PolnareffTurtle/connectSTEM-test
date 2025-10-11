@@ -22,7 +22,7 @@ class Game:
         # place player at the center of the internal display (not the scaled window)
         self.player = Player(self, (self.display.get_width() // 2, self.display.get_height() // 2))
         movement = [[0,0],[0,0]]  # [[left,right],[up,down]]
-        EnemyList = [Enemy(self, (100,100)),Enemy(self, (200,150)),Enemy(self, (150,50))]
+        EnemyList = [Enemy(self, (100,100)),Enemy(self, (200,150)),Enemy(self, (150,50)), Enemy(self)]
         while self.gamemode == GameState.GAME_RUNNING:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
