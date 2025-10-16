@@ -24,12 +24,12 @@ class Tile:
         self.rotation = rotation
 
 class Tilemap:
-    def __init__(self,game,level,tile_size=16):
+    def __init__(self,game,map,tile_size=16):
         self.game=game
-        self.level=level
+        self.map=map
         self.tile_size = tile_size
         self.tilemap = dict()
-        self.open_json(level)
+        self.open_json(map)
 
     def open_json(self,map):
         with open('assets/tiled/maps/'+str(map)+'.json') as f:
