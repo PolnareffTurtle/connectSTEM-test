@@ -50,13 +50,23 @@ class Game:
 
             self.display.fill('aquamarine')
             self.player.update([movement[0][1]-movement[0][0],movement[1][1]-movement[1][0]])
-            self.player.render(self.display)
+
             for enemy in EnemyList:
+                enemy.weapon.use(enemy, self.player, self)
+
+                if (pygame.time.get_ticks() - enemy.weapon.last_attack) < 200:
+                    pygame.draw.circle(game.display, (255, 189, 189), enemy.rect.center, enemy.weapon.attack_radius, 0)
+
+                pygame.draw.circle(self.display, (255, 0, 0), enemy.rect.center, enemy.weapon.attack_radius, 1)
                 enemy.render(self.display)
+
+
+            self.player.render(self.display)
 
             self.clock.tick(60)
             self.screen.blit(pygame.transform.scale(self.display,self.screen.get_size()),(0,0))
             pygame.display.update()
+            print(self.player.health)
 
     def run(self):
         while True:
