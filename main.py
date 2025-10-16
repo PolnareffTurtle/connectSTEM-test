@@ -1,10 +1,10 @@
 import pygame
 from sys import exit
-from scripts.utils import load_image,load_images
+from scripts.utils import load_image,load_images,spritesheet_to_surf_list
 from scripts.enemy import Enemy
 from scripts.player import Player
 from scripts.enums import GameState
-
+from scripts.tilemap import Tilemap
 
 class Game:
     def __init__(self):
@@ -15,7 +15,8 @@ class Game:
         self.gamemode = GameState.GAME_RUNNING
         self.assets = {
             'player': load_image('player.png',alpha=True),
-            'enemy': load_image('enemy.png',alpha=True)
+            'enemy': load_image('enemy.png',alpha=True),
+            'tiles': spritesheet_to_surf_list(load_image('spritesheet.png',alpha=True),16,16,alpha=True,scale=1),
         }
 
     def running(self):
@@ -23,6 +24,14 @@ class Game:
         self.player = Player(self, (self.display.get_width() // 2, self.display.get_height() // 2))
         movement = [[0,0],[0,0]]  # [[left,right],[up,down]]
         EnemyList = [Enemy(self, (100,100)),Enemy(self, (200,150)),Enemy(self, (150,50))]
+        self.tilemap = Tilemap(self,0)
+        print(self.player.pos)
+
+        # this makes the player centered on the screen
+        offset = [
+            self.player.pos[0] - self.display.get_width() / 2, 
+            self.player.pos[1] - self.display.get_height() / 2
+            ]
         while self.gamemode == GameState.GAME_RUNNING:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -47,12 +56,31 @@ class Game:
                         movement[1][0] = 0
                     if event.key in [pygame.K_DOWN,pygame.K_s]:
                         movement[1][1] = 0
+            
+            # smooth offset scrolling
+            """offset[0] += (self.player.pos[0] - self.display.get_width() / 2 - offset[0])/10
+            offset[1] += (self.player.pos[1] - self.display.get_height() / 2 - offset[1])/10"""
+
+            # update player position before updating offsets
+            self.player.update(
+                [movement[0][1]-movement[0][0],movement[1][1]-movement[1][0]],
+                self.tilemap
+                )
+
+            # rigid offset scrolling
+            offset[0] = self.player.pos[0] - self.display.get_width() / 2
+            offset[1] = self.player.pos[1] - self.display.get_height() / 2
+            # integer render offset for pixel alignment
+            render_offset = (int(offset[0]),int(offset[1]))
 
             self.display.fill('aquamarine')
-            self.player.update([movement[0][1]-movement[0][0],movement[1][1]-movement[1][0]])
-            self.player.render(self.display)
+            self.tilemap.render(self.display,offset=render_offset)
+            
+            self.player.render(self.display,offset=render_offset)
             for enemy in EnemyList:
-                enemy.render(self.display)
+                enemy.render(self.display,offset=render_offset)
+            
+            
 
             self.clock.tick(60)
             self.screen.blit(pygame.transform.scale(self.display,self.screen.get_size()),(0,0))
