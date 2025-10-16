@@ -32,7 +32,10 @@ class Game:
             self.player.pos[0] - self.display.get_width() / 2, 
             self.player.pos[1] - self.display.get_height() / 2
             ]
+        EnemyList = [Enemy(self, (100,100)),Enemy(self, (200,150)),Enemy(self, (150,50)), Enemy(self)]
         while self.gamemode == GameState.GAME_RUNNING:
+
+            ### INPUTS ###
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -73,6 +76,11 @@ class Game:
             # integer render offset for pixel alignment
             render_offset = (int(offset[0]),int(offset[1]))
 
+            ### UPDATES ###
+            delta_time = self.clock.get_time() / 16.666 #16.666ms is 60fps
+            for enemy in EnemyList:
+                enemy.update(delta_time)
+            ### RENDERING ###
             self.display.fill('aquamarine')
             self.tilemap.render(self.display,offset=render_offset)
             
