@@ -20,7 +20,6 @@ class Weapon:
             self.cooldown -= delta_time * random.uniform(0.8,1.2)
         if self.cooldown < 0:
             self.cooldown = 0
-        pass
 
     def use(self, user, direction):
         if self.cooldown > 0:
@@ -32,13 +31,9 @@ class Weapon:
                 pass
             case 'lunge':
                 self.lunge_attack(user, direction)
-                pass
             case _:
                 print("Unknown weapon type")
-        pass
 
     def lunge_attack(self, user, direction):
         user.velocity = direction * self.attack_power
-        self.cooldown = 40/self.attack_speed
-        pass
-
+        self.cooldown = 5/self.attack_speed
