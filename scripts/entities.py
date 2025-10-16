@@ -5,12 +5,15 @@ class Entity:
     def __init__(self,game,pos,image_key,atk=1,atk_spd=1,atk_size=1, WeaponType=None):
         self.image = game.assets[image_key]
         self.mask = pygame.mask.from_surface(self.image)
-        self.rect = self.image.get_rect(center=pos)
+        self.pos = list(pos)
         self.game = game
         self.weapon = Weapon(atk,atk_spd, atk_size, WeaponType)
         self.velocity = pygame.math.Vector2(0,0)
         self.friction = 0
     
+    def render(self,screen,offset=(0,0)):
+        rect = self.rect()
+        screen.blit(self.image,(rect.x-offset[0],rect.y-offset[1]))
     def set_velocity(self,velocity:pygame.math.Vector2):
         self.velocity = velocity
 
@@ -53,4 +56,7 @@ class Entity:
 
     def attack(self):
         self.weapon.use()
+
+    def rect(self):
+        return self.image.get_rect(center=self.pos)
 
