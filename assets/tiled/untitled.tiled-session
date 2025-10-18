@@ -1,0 +1,36 @@
+{
+    "activeFile": "spritesheet.tsx",
+    "fileStates": {
+        "/Users/yechanpark/projects/python/teaching/ConnectSTEM game/assets/images/spritesheet.tsx": {
+            "scaleInDock": 1
+        },
+        "levels/0.json": {
+            "scale": 0.38,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 798.6842105263158,
+                "y": 798.6842105263158
+            }
+        },
+        "levels/level_00.json": {
+            "scale": 0.38,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 798.6842105263158,
+                "y": 798.6842105263158
+            }
+        },
+        "maps/0.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 276,
+                "y": 282
+            }
+        },
+        "spritesheet.tsx": {
+            "scaleInDock": 2,
+            "scaleInEditor": 1
+        }
+    }
+}
