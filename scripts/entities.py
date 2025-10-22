@@ -4,12 +4,17 @@ from scripts.weapon import Weapon
 sign = lambda x: (x>0) - (x<0)
 
 class Entity:
-    def __init__(self,game,pos,image_key,atk=1,atk_spd=1,atk_size=1, WeaponType=None):
-        self.image = game.assets[image_key]
+
+    #TODO: create absolute float positioning for smoother movement
+    #TODO: make position a vector
+
+    image_key = None
+
+    def __init__(self,game,pos):
+        self.image = game.assets[self.image_key]
         self.mask = pygame.mask.from_surface(self.image)
         self.pos = list(pos)
         self.game = game
-        self.weapon = Weapon(atk,atk_spd, atk_size, WeaponType)
         self.velocity = pygame.math.Vector2(0,0)
         self.friction = 0
     
@@ -65,16 +70,12 @@ class Entity:
 
         # apply friction
         if self.friction != 0:
-            if abs(self.velocity.x) < self.friction * dt:
+            """if abs(self.velocity.x) < self.friction * dt:
                 self.velocity.x = 0
             if abs(self.velocity.y) < self.friction * dt:
-                self.velocity.y = 0
+                self.velocity.y = 0"""
             self.velocity.x -= sign(self.velocity.x)*self.friction * dt
             self.velocity.y -= sign(self.velocity.y)*self.friction * dt
 
-    def attack(self):
-        self.weapon.use()
-
     def rect(self):
         return self.image.get_rect(center=self.pos)
-

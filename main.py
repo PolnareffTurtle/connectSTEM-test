@@ -1,7 +1,7 @@
 import pygame
 from sys import exit
 from scripts.utils import load_image,load_images,spritesheet_to_surf_list
-from scripts.enemy import Enemy
+from scripts.enemy import Enemy, CircleEnemy, LungeEnemy
 from scripts.player import Player
 from scripts.enums import GameState
 from scripts.tilemap import Tilemap
@@ -30,8 +30,7 @@ class Game:
             self.player.pos[0] - self.display.get_width() / 2, 
             self.player.pos[1] - self.display.get_height() / 2
             ]
-        EnemyList = [Enemy(self, (100,100)),Enemy(self, (200,150)),Enemy(self, (150,50)), Enemy(self)]
-        #EnemyList = [Enemy(self,(100,100))]
+        EnemyList = [CircleEnemy(self, (100,100)),CircleEnemy(self, (200,150)),CircleEnemy(self, (150,50)), LungeEnemy(self,(300,200))]
         while self.gamemode == GameState.GAME_RUNNING:
 
             dt = self.clock.tick(60) / 1000
@@ -84,7 +83,6 @@ class Game:
             for enemy in EnemyList:
                 enemy.render(self.display,offset=render_offset)
             
-            print(self.player.health)
 
             self.screen.blit(pygame.transform.scale(self.display,self.screen.get_size()),(0,0))
             pygame.display.update()

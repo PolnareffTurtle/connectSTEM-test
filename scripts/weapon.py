@@ -1,6 +1,5 @@
 import math
 import pygame
-from enum import Enum
 from scripts import enums
 import random
 
@@ -9,56 +8,57 @@ import random
 # but instead is a classifier for how the entity attacks
 
 class Weapon:
-    def __init__(self,attack_power,attack_speed,attack_size = 1,type = enums.WeaponType.NONE, attack_radius=25):
-        self.attack_power = attack_power
-        self.attack_speed = attack_speed
-        self.attack_size = attack_size 
-        self.type = type
+
+    type = None
+
+    def __init__(self,attack_power: int = 1,attack_speed: float = 1):
+        self.attack_power = attack_power 
+        self.attack_speed = attack_speed 
         self.cooldown = 0
-        self.attack_radius = attack_radius
-        self.last_circle_attack = -10000
+        self.last_attack = None
     
-    def update(self, delta_time):
+    def update(self, delta_time: float):
         if self.cooldown > 0:
             self.cooldown -= delta_time * random.uniform(0.8,1.2)
         if self.cooldown < 0:
             self.cooldown = 0
 
-    def use(self, user, direction=None, target=None):
-        if self.cooldown > 0:
-            return
-        match self.type:
-            case 'circle':
-                self.circle_attack(user, target)
-            case 'projectile':
-                pass
-            case 'lunge':
-                self.lunge_attack(user, direction)
-            case _:
-                print("Unknown weapon type")
+    def use(self, user, direction: pygame.Vector2 = None, targets: list = []):
+        if self.cooldown <= 0:
+            self.cooldown = 1 / self.attack_speed
+            self.last_attack = pygame.time.get_ticks()
+            self.attack(user, direction, targets)
     
-    def lunge_attack(self, user, direction):
-        user.velocity = direction * self.attack_power
-        self.cooldown = 5/self.attack_speed
-
-    def circle_attack(self, user, target):
-        self.last_circle_attack = pygame.time.get_ticks()
-        self.cooldown = 3 / self.attack_speed
-        if self.attack_radius >= math.sqrt((user.pos[0] - target.pos[0]) ** 2 + (user.pos[1] - target.pos[1]) ** 2):
+    def attack(self, user, direction=None, targets: list = []):
+        for target in targets:
             target.health -= self.attack_power
             target.health = max(0, target.health)
 
-"""
-def use(self, owner, target, game):
-        delta_x = target.rect.centerx - owner.rect.centerx
-        delta_y = target.rect.centery - owner.rect.centery
-        distance = math.sqrt(pow(delta_x, 2) + pow(delta_y, 2))
+class CircleWeapon(Weapon):
 
-        if distance < self.attack_radius:
-            print("used\n")
-            return circle_attack(self, owner, target, game)
-        return None
-        # print("distance:", distance, end = " ")
-        # print("health:", target.health)
+    type = enums.WeaponType.CIRCLE
 
-"""
+    def __init__(self, attack_power, attack_speed, attack_radius=25):
+        super().__init__(attack_power, attack_speed)
+        self.attack_radius = attack_radius
+        self.last_circle_attack = 0
+
+    def attack(self, user, direction=None, targets: list = []):
+        in_range = []
+        for target in targets:
+            if self.attack_radius >= math.sqrt((user.pos[0] - target.pos[0]) ** 2 + (user.pos[1] - target.pos[1]) ** 2):
+                in_range.append(target)
+        super().attack(user, targets=in_range)
+        
+
+class LungeWeapon(Weapon):
+
+    type = enums.WeaponType.LUNGE
+
+    def __init__(self, attack_power, attack_speed):
+        super().__init__(attack_power, attack_speed)
+
+    def attack(self, user, direction, targets: list = []):
+        print('lunge use')
+        user.velocity = direction * self.attack_power
+
