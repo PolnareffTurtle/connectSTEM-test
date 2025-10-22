@@ -31,7 +31,7 @@ class Game:
             self.player.pos[1] - self.display.get_height() / 2
             ]
         EnemyList = [Enemy(self, (100,100)),Enemy(self, (200,150)),Enemy(self, (150,50)), Enemy(self)]
-        EnemyList = [Enemy(self,(100,100))]
+        #EnemyList = [Enemy(self,(100,100))]
         while self.gamemode == GameState.GAME_RUNNING:
 
             dt = self.clock.tick(60) / 1000
@@ -75,6 +75,7 @@ class Game:
             for enemy in EnemyList:
                 enemy.update(dt)
                 
+                
             ### RENDERING ###
             self.display.fill('aquamarine')
             self.tilemap.render(self.display,offset=render_offset)
@@ -83,7 +84,8 @@ class Game:
             for enemy in EnemyList:
                 enemy.render(self.display,offset=render_offset)
             
-            
+            print(self.player.health)
+
             self.screen.blit(pygame.transform.scale(self.display,self.screen.get_size()),(0,0))
             pygame.display.update()
 
