@@ -3,35 +3,20 @@ import pygame
 from enum import Enum
 from scripts import enums
 import random
-def circle_attack(self, owner, target, game):
-    now = pygame.time.get_ticks()
-    cooldown = 1500 / self.attack_speed
-    # print("last attack:", self.last_attack)
-    # print("cooldown:", cooldown)
-    # print("now:", now)
-    delta_x = target.rect.centerx - owner.rect.centerx
-    if self.last_attack + cooldown <= now:
-        # print("last attack:", self.last_attack)
 
-        target.health -= self.attack_power
-        target.health = max(0, target.health)
-
-        self.last_attack = now
-        return True
-    else:
-        return False
 
 # This isn't limited to traditional "weapons" 
 # but instead is a classifier for how the entity attacks
+
 class Weapon:
-    def __init__(self,attack_power,attack_speed,attack_size = 1,type = enums.WeaponType.NONE):
+    def __init__(self,attack_power,attack_speed,attack_size = 1,type = enums.WeaponType.NONE, attack_radius=25):
         self.attack_power = attack_power
         self.attack_speed = attack_speed
         self.attack_size = attack_size 
         self.type = type
         self.cooldown = 0
-        # self.attack_radius = attack_radius
-        # self.last_attack = -10000
+        self.attack_radius = attack_radius
+        self.last_circle_attack = -10000
     
     def update(self, delta_time):
         if self.cooldown > 0:
@@ -39,12 +24,12 @@ class Weapon:
         if self.cooldown < 0:
             self.cooldown = 0
 
-    def use(self, user, direction):
+    def use(self, user, direction=None, target=None):
         if self.cooldown > 0:
             return
         match self.type:
             case 'circle':
-                circle_attack(self.attack_power, self.attack_size)
+                self.circle_attack(user, target)
             case 'projectile':
                 pass
             case 'lunge':
@@ -55,6 +40,13 @@ class Weapon:
     def lunge_attack(self, user, direction):
         user.velocity = direction * self.attack_power
         self.cooldown = 5/self.attack_speed
+
+    def circle_attack(self, user, target):
+        self.last_circle_attack = pygame.time.get_ticks()
+        self.cooldown = 3 / self.attack_speed
+        if self.attack_radius >= math.sqrt((user.pos[0] - target.pos[0]) ** 2 + (user.pos[1] - target.pos[1]) ** 2):
+            target.health -= self.attack_power
+            target.health = max(0, target.health)
 
 """
 def use(self, owner, target, game):

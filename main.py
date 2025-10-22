@@ -31,7 +31,7 @@ class Game:
             self.player.pos[1] - self.display.get_height() / 2
             ]
         EnemyList = [Enemy(self, (100,100)),Enemy(self, (200,150)),Enemy(self, (150,50)), Enemy(self)]
-        EnemyList = [Enemy(self,(100,100))]
+        #EnemyList = [Enemy(self,(100,100))]
         while self.gamemode == GameState.GAME_RUNNING:
 
             dt = self.clock.tick(60) / 1000
@@ -75,27 +75,19 @@ class Game:
             for enemy in EnemyList:
                 enemy.update(dt)
                 
+                
             ### RENDERING ###
             self.display.fill('aquamarine')
             self.tilemap.render(self.display,offset=render_offset)
             
             self.player.render(self.display,offset=render_offset)
             for enemy in EnemyList:
-                enemy.weapon.use(enemy, self.player, self)
-
-                if (pygame.time.get_ticks() - enemy.weapon.last_attack) < 200:
-                    pygame.draw.circle(game.display, (255, 189, 189), enemy.rect.center, enemy.weapon.attack_radius, 0)
-
-                pygame.draw.circle(self.display, (255, 0, 0), enemy.rect.center, enemy.weapon.attack_radius, 1)
                 enemy.render(self.display,offset=render_offset)
             
-            
-
-            self.player.render(self.display)
+            print(self.player.health)
 
             self.screen.blit(pygame.transform.scale(self.display,self.screen.get_size()),(0,0))
             pygame.display.update()
-            print(self.player.health)
 
     def run(self):
         while True:

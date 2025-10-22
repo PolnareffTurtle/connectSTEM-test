@@ -28,16 +28,12 @@ class Entity:
             if rect.colliderect(entity_rect):
                 if prev_movement[0] < 0:
                     entity_rect.left = rect.right
-                    #self.velocity.x = 0
                 elif prev_movement[0] > 0:
                     entity_rect.right = rect.left
-                    #self.velocity.x = 0
                 if prev_movement[1] < 0:
                     entity_rect.top = rect.bottom
-                    #self.velocity.y = 0
                 elif prev_movement[1] > 0:
                     entity_rect.bottom = rect.top
-                    #self.velocity.y = 0
 
     def update(self, dt):
         tilemap = self.game.tilemap
