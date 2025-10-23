@@ -76,6 +76,7 @@ class Entity:
             self.velocity.x -= sign(self.velocity.x)*self.friction * dt
             self.velocity.y -= sign(self.velocity.y)*self.friction * dt
 
+        # clamp very small velocities to 0
         if self.velocity.magnitude() < 1:
             self.velocity = pygame.math.Vector2(0,0)
         if self.velocity.magnitude() == 0:
