@@ -4,12 +4,15 @@ from scripts.weapon import Weapon
 sign = lambda x: (x>0) - (x<0)
 
 class Entity:
-    def __init__(self,game,pos,image_key,atk=1,atk_spd=1,atk_size=1, WeaponType=None):
-        self.image = game.assets[image_key]
+
+    image_key = None
+
+    def __init__(self,game,pos: tuple[float,float]):
+        self.image = game.assets[self.image_key]
+        self.size = self.image.get_size()
         self.mask = pygame.mask.from_surface(self.image)
-        self.pos = list(pos)
+        self.pos = pygame.math.Vector2(pos)
         self.game = game
-        self.weapon = Weapon(atk,atk_spd, atk_size, WeaponType)
         self.velocity = pygame.math.Vector2(0,0)
         self.friction = 0
     
@@ -23,58 +26,61 @@ class Entity:
     def set_friction(self,friction:float):
         self.friction = friction 
 
-    def check_collisions(self,entity_rect,rects,prev_movement):
+    def aabb_collide(self,rect: pygame.Rect) -> bool:
+        return ( 
+            self.pos.x - self.size[0]/2 < rect.right and
+            self.pos.x + self.size[0]/2 > rect.left and
+            self.pos.y - self.size[1]/2 < rect.bottom and
+            self.pos.y + self.size[1]/2 > rect.top
+        )
+
+    def check_collisions(self,rects, prev_movement: tuple = (0,0)):
+        # AABB collision detection without using rects (preserves float position since rects use integers)
         for rect in rects:
-            if rect.colliderect(entity_rect):
-                if prev_movement[0] < 0:
-                    entity_rect.left = rect.right
-                elif prev_movement[0] > 0:
-                    entity_rect.right = rect.left
-                if prev_movement[1] < 0:
-                    entity_rect.top = rect.bottom
-                elif prev_movement[1] > 0:
-                    entity_rect.bottom = rect.top
+            if self.aabb_collide(rect):
+                if prev_movement[0] > 0:
+                    self.pos.x = rect.left - self.size[0]/2
+                elif prev_movement[0] < 0:
+                    self.pos.x = rect.right + self.size[0]/2
+                if prev_movement[1] > 0:
+                    self.pos.y = rect.top - self.size[1]/2
+                elif prev_movement[1] < 0:
+                    self.pos.y = rect.bottom + self.size[1]/2
 
     def update(self, dt):
         tilemap = self.game.tilemap
-        entity_rect = self.rect()
         physics_rects = tilemap.physics_rects_around(self.pos)
 
         # apply velocity and check for collisions (x and y separately)
-        entity_rect.x += self.velocity.x * dt
-        self.check_collisions(entity_rect,physics_rects,[self.velocity.x,0])
-        entity_rect.y += self.velocity.y * dt
-        self.check_collisions(entity_rect,physics_rects,[0,self.velocity.y])
+        self.pos.x += self.velocity.x * dt
+        self.check_collisions(physics_rects, (self.velocity.x * dt,0))
+        self.pos.y += self.velocity.y * dt
+        self.check_collisions(physics_rects, (0,self.velocity.y * dt))
 
-        # check for bounds
-        if entity_rect.left < 0:
-            entity_rect.left = 0
+        # check for bounds using self.pos and self.size
+        if self.pos.x - self.size[0]/2 < 0:
+            self.pos.x = self.size[0]/2
             self.velocity.x = 0
-        if entity_rect.right > tilemap.width * tilemap.tile_size:
-            entity_rect.right = tilemap.width * tilemap.tile_size
+        if self.pos.x + self.size[0] > tilemap.width * tilemap.tile_size:
+            self.pos.x = tilemap.width * tilemap.tile_size + self.size[0]/2
             self.velocity.x = 0
-        if entity_rect.top < 0:
-            entity_rect.top = 0
+        if self.pos.y - self.size[1]/2 < 0:
+            self.pos.y = self.size[1]/2
             self.velocity.y = 0
-        if entity_rect.bottom > tilemap.height * tilemap.tile_size:
-            entity_rect.bottom = tilemap.height * tilemap.tile_size
+        if self.pos.y + self.size[1]/2 > tilemap.height * tilemap.tile_size:
+            self.pos.y = tilemap.height * tilemap.tile_size + self.size[1]/2
             self.velocity.y = 0
-
-        # update position
-        self.pos = [entity_rect.centerx,entity_rect.centery]
 
         # apply friction
         if self.friction != 0:
-            if abs(self.velocity.x) < self.friction * dt:
-                self.velocity.x = 0
-            if abs(self.velocity.y) < self.friction * dt:
-                self.velocity.y = 0
             self.velocity.x -= sign(self.velocity.x)*self.friction * dt
             self.velocity.y -= sign(self.velocity.y)*self.friction * dt
 
-    def attack(self):
-        self.weapon.use()
+        # clamp very small velocities to 0
+        if self.velocity.magnitude() < 1:
+            self.velocity = pygame.math.Vector2(0,0)
+        if self.velocity.magnitude() == 0:
+            self.pos = pygame.math.Vector2(round(self.pos.x),round(self.pos.y))
 
     def rect(self):
-        return self.image.get_rect(center=self.pos)
-
+        return self.image.get_rect(center=(int(self.pos.x),int(self.pos.y)))

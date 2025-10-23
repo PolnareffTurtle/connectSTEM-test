@@ -1,11 +1,15 @@
 import pygame
 from math import sqrt
 from scripts.entities import Entity
+from scripts.enums import WeaponType
 
 class Player(Entity):
+    
+    image_key = 'player'
+
     def __init__(self,game,pos):
-        super().__init__(game, pos, 'player')
-        self.speed = 50
+        super().__init__(game, pos)
+        self.speed = 100
         self.max_health = 100
         self.health = 100
 

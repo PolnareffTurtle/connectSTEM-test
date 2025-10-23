@@ -1,34 +1,60 @@
 import pygame
 from scripts.entities import Entity
+from scripts.enums import WeaponType
+from scripts.weapon import Weapon, CircleWeapon, LungeWeapon
 import random
 
-range = 100
 class Enemy(Entity):
-    def __init__(self,game, pos=None, image_key='enemy', target:Entity=None):
+
+    image_key = 'enemy'
+    range = 100
+
+    def __init__(self,game, pos=None, target:Entity=None):
         if not pos:
             pos = (random.randint(10, game.tilemap.width*game.tilemap.tile_size-10), 
                    random.randint(10, game.tilemap.height*game.tilemap.tile_size-10))
 
-        super().__init__(game, pos, image_key, atk=50, WeaponType='circle')
-        self.set_friction(50)
+        super().__init__(game, pos)
+        self.set_friction(200)
         self.target = target if target != None else game.player
         
     def update(self, dt):
         super().update(dt)
         self.weapon.update(dt)
-        dist = ((self.target.pos[0] - self.pos[0])**2 +
-                (self.target.pos[1] - self.pos[1])**2
-                )**0.5
-        if self.weapon.type == 'lunge':
-            if (dist < range and self.target.pos != self.pos):
-                direction = pygame.math.Vector2((self.target.pos[0] - self.pos[0]), (self.target.pos[1] - self.pos[1])).normalize()
-                self.weapon.use(user=self, direction=direction)
-        if self.weapon.type == 'circle':
-            self.weapon.use(user=self, target=self.target)
-            
 
+class CircleEnemy(Enemy):
+
+    def __init__(self,game, pos=None, target:Entity=None):
+        super().__init__(game, pos, target)
+        self.weapon = CircleWeapon(attack_power=10, attack_speed=1, attack_radius=30)
+
+    def update(self, dt):
+        self.weapon.use(self, targets=[self.target])
+        super().update(dt)
+    
     def render(self,screen,offset=(0,0)):
-        if self.weapon.type == 'circle':
-            if pygame.time.get_ticks() - self.weapon.last_circle_attack < 300:
-                pygame.draw.circle(screen, (255,0,0,50), (int(self.pos[0]-offset[0]), int(self.pos[1]-offset[1])), self.weapon.attack_radius)
+        
+        # this is a pulsing circle to show the attack radius
+        if self.weapon.last_attack and self.weapon.last_attack + 500 > pygame.time.get_ticks():
+            # pygame is weird and requires surfaces for alpha
+            surface = pygame.Surface((self.weapon.attack_radius*2,self.weapon.attack_radius*2),pygame.SRCALPHA)
+            alpha = 200 - int(200 * (pygame.time.get_ticks() - self.weapon.last_attack) / 500)
+            pygame.draw.circle(surface, (255,0,0,alpha), 
+                               (self.weapon.attack_radius,self.weapon.attack_radius), 
+                               self.weapon.attack_radius)
+            screen.blit(surface, self.pos-offset-(self.weapon.attack_radius,self.weapon.attack_radius))
         super().render(screen,offset)
+
+class LungeEnemy(Enemy):
+
+    def __init__(self,game, pos=None, target:Entity=None):
+        super().__init__(game, pos, target)
+        self.weapon = LungeWeapon(attack_power=200, attack_speed=0.3)
+
+    def update(self, dt):
+        direction = self.target.pos - self.pos # pygame.Vector2
+        if direction.magnitude() < self.range:
+            if direction.magnitude() != 0:
+                direction = direction.normalize()
+            self.weapon.use(self, direction=direction)
+        super().update(dt)
