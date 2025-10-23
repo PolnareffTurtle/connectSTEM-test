@@ -42,8 +42,7 @@ class CircleEnemy(Enemy):
             pygame.draw.circle(surface, (255,0,0,alpha), 
                                (self.weapon.attack_radius,self.weapon.attack_radius), 
                                self.weapon.attack_radius)
-            screen.blit(surface, (int(self.pos[0]-self.weapon.attack_radius - offset[0]), 
-                                  int(self.pos[1]-self.weapon.attack_radius - offset[1])))
+            screen.blit(surface, self.pos-offset-(self.weapon.attack_radius,self.weapon.attack_radius))
         super().render(screen,offset)
 
 class LungeEnemy(Enemy):
@@ -53,7 +52,7 @@ class LungeEnemy(Enemy):
         self.weapon = LungeWeapon(attack_power=200, attack_speed=0.3)
 
     def update(self, dt):
-        direction = pygame.math.Vector2(self.target.pos[0] - self.pos[0], self.target.pos[1] - self.pos[1])
+        direction = self.target.pos - self.pos # pygame.Vector2
         if direction.magnitude() < self.range:
             if direction.magnitude() != 0:
                 direction = direction.normalize()

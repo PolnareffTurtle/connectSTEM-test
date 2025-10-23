@@ -9,7 +9,7 @@ class Player(Entity):
 
     def __init__(self,game,pos):
         super().__init__(game, pos)
-        self.speed = 50
+        self.speed = 100
         self.max_health = 100
         self.health = 100
 

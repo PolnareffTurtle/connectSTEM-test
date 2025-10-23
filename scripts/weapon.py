@@ -46,7 +46,7 @@ class CircleWeapon(Weapon):
     def attack(self, user, direction=None, targets: list = []):
         in_range = []
         for target in targets:
-            if self.attack_radius >= math.sqrt((user.pos[0] - target.pos[0]) ** 2 + (user.pos[1] - target.pos[1]) ** 2):
+            if self.attack_radius >= user.pos.distance_to(target.pos):
                 in_range.append(target)
         super().attack(user, targets=in_range)
         
@@ -59,6 +59,4 @@ class LungeWeapon(Weapon):
         super().__init__(attack_power, attack_speed)
 
     def attack(self, user, direction, targets: list = []):
-        print('lunge use')
         user.velocity = direction * self.attack_power
-

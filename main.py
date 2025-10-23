@@ -26,10 +26,7 @@ class Game:
         self.tilemap = Tilemap(self,map=0)
 
         # this makes the player centered on the screen
-        offset = [
-            self.player.pos[0] - self.display.get_width() / 2, 
-            self.player.pos[1] - self.display.get_height() / 2
-            ]
+        offset = self.player.pos - pygame.math.Vector2(self.display.get_size()) / 2
         EnemyList = [CircleEnemy(self, (100,100)),CircleEnemy(self, (200,150)),CircleEnemy(self, (150,50)), LungeEnemy(self,(300,200))]
         while self.gamemode == GameState.GAME_RUNNING:
 
@@ -65,8 +62,7 @@ class Game:
             self.player.update(net_movement,dt)
 
             # rigid offset scrolling
-            offset[0] = self.player.pos[0] - self.display.get_width() / 2
-            offset[1] = self.player.pos[1] - self.display.get_height() / 2
+            offset = self.player.pos - pygame.math.Vector2(self.display.get_size()) / 2
             # integer render offset for pixel alignment
             render_offset = tuple(map(int,offset))
 
