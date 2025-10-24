@@ -9,18 +9,25 @@ NEIGHBOR_OFFSETS = [
 ]
 
 # read each tile type in spritesheet.json
-tile_types = dict()
+tile_meta = dict()
 with open('assets/tiled/spritesheet.json') as f:
     rawjson = f.read()
     jsondata = json.loads(rawjson)
-    for tile in jsondata['tiles']:
-        tile_types[tile['id']] = tile['type']
+    for tile in jsondata.get('tiles', []):
+        # store the full metadata so we can access type and properties
+        tile_meta[tile['id']] = tile
 
 class Tile:
     def __init__(self, tile_index, pos, rotation=0):
         self.index = tile_index
         self.pos = pos
-        self.type = tile_types.get(tile_index,None)
+        meta = tile_meta.get(tile_index, {})
+        self.type = meta.get('type', None)
+        # convert properties list to a dict for easy lookup
+        props = {}
+        for p in meta.get('properties', []):
+            props[p.get('name')] = p.get('value')
+        self.properties = props
         self.rotation = rotation
 
 class Tilemap:
@@ -29,6 +36,8 @@ class Tilemap:
         self.map=map
         self.tile_size = tile_size
         self.tilemap = dict()
+        # discovered spawn points: list of {'pos':(px,py),'entity':str}
+        self.spawns = []
         self.open_json(map)
 
     def open_json(self,map):
@@ -48,7 +57,13 @@ class Tilemap:
             y = j // jsondata['width']
 
             if val != 0:
-                self.tilemap[(x, y)] = Tile(val - 1, (x, y))
+                tile = Tile(val - 1, (x, y))
+                # collect spawn tiles (type == 'spawn' and an 'entity' property)
+                if tile.type == 'spawn' and tile.properties.get('entity'):
+                    px = tile.pos[0] * self.tile_size + (self.tile_size // 2)
+                    py = tile.pos[1] * self.tile_size + (self.tile_size // 2)
+                    self.spawns.append({'pos': (px, py), 'entity': tile.properties.get('entity'), 'subclass': tile.properties.get('subclass', None)})
+                self.tilemap[(x, y)] = tile
 
     def tiles_around(self,pos):
         tiles=[]

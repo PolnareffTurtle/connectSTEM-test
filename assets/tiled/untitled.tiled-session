@@ -1,5 +1,8 @@
 {
-    "activeFile": "spritesheet.tsx",
+    "activeFile": "maps/0.json",
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "/Users/yechanpark/projects/python/teaching/ConnectSTEM game/assets/images/spritesheet.tsx": {
             "scaleInDock": 1
@@ -24,13 +27,24 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 276,
-                "y": 282
+                "x": 275.5,
+                "y": 245.5
             }
+        },
+        "spritesheet.json": {
+            "scaleInDock": 1
         },
         "spritesheet.tsx": {
             "scaleInDock": 2,
             "scaleInEditor": 1
         }
-    }
+    },
+    "last.externalTilesetPath": "/Users/yechanpark/projects/python/teaching/ConnectSTEM game/assets/tiled",
+    "openFiles": [
+        "maps/0.json"
+    ],
+    "project": "",
+    "recentFiles": [
+        "maps/0.json"
+    ]
 }
