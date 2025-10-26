@@ -19,5 +19,11 @@ class Player(Entity):
         self.set_velocity(pygame.math.Vector2(movement))
         if self.velocity.magnitude() != 0:
             self.velocity.scale_to_length(self.speed)
+
+        if self.health <= 0:
+            self.set_velocity(pygame.math.Vector2(0, 0))
+            super().update(dt)
+            return
+
         
         super().update(dt)

@@ -1,6 +1,24 @@
 import pygame
 from scripts.weapon import Weapon
 
+class HealthBar:
+    def __init__(self, entity):
+        self.entity = entity
+    def draw(self, screen, offset):
+        health_ratio = max(0, min(1, self.entity.health / self.entity.max_health))
+        width = self.entity.size[0]
+        x = int(self.entity.pos.x - width/2 - offset[0])
+        y = int(self.entity.pos.y - self.entity.size[1]/2 - 10 - offset[1])
+
+        pygame.draw.rect(screen, (0, 0, 0), (x, y, width, 5))
+
+        r = int(255 * (1 - health_ratio))
+        g = int(255 * health_ratio)
+        b = 0
+        color = (r, g, b)
+        pygame.draw.rect(screen, color, (x+1, y+1, int((width-2) * health_ratio), 3))
+
+
 sign = lambda x: (x>0) - (x<0)
 
 class Entity:
@@ -15,10 +33,14 @@ class Entity:
         self.game = game
         self.velocity = pygame.math.Vector2(0,0)
         self.friction = 0
-    
+        self.max_health = 100
+        self.health = self.max_health
+        self.healthbar = HealthBar(self)
+
     def render(self,screen,offset=(0,0)):
         rect = self.rect()
         screen.blit(self.image,(rect.x-offset[0],rect.y-offset[1]))
+        self.healthbar.draw(screen, offset)
 
     def set_velocity(self,velocity:pygame.math.Vector2):
         self.velocity = velocity
