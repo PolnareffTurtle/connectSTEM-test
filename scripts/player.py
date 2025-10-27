@@ -21,7 +21,6 @@ class Player(Entity):
             self.velocity.scale_to_length(self.speed)
         
         for coin in self.game.CoinList:
-            print("Checking coin at position:", coin.pos)
             if self.aabb_collide(coin.rect()):
                 coin.pickup()
         
