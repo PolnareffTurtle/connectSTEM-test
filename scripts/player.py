@@ -20,4 +20,9 @@ class Player(Entity):
         if self.velocity.magnitude() != 0:
             self.velocity.scale_to_length(self.speed)
         
+        for coin in self.game.CoinList:
+            print("Checking coin at position:", coin.pos)
+            if self.aabb_collide(coin.rect()):
+                coin.pickup()
+        
         super().update(dt)

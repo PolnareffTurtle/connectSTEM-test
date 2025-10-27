@@ -84,3 +84,7 @@ class Entity:
 
     def rect(self):
         return self.image.get_rect(center=(int(self.pos.x),int(self.pos.y)))
+
+    #should be extended by subclasses
+    def on_death(self):
+        pass
