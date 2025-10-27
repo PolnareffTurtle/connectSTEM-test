@@ -37,7 +37,7 @@ class Entity:
     def check_collisions(self,rects, prev_movement: tuple = (0,0)):
         # AABB collision detection without using rects (preserves float position since rects use integers)
         for rect in rects:
-            if self.aabb_collide(rect):
+            if self.aabb_collide(rect): 
                 if prev_movement[0] > 0:
                     self.pos.x = rect.left - self.size[0]/2
                 elif prev_movement[0] < 0:

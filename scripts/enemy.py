@@ -11,7 +11,7 @@ class Enemy(Entity):
     range = 100
     value = 1
 
-    def __init__(self,game, pos=None, target:Entity=None):
+    def __init__(self,game, pos=None, target:Entity=None, max_health: int = 100):
         if not pos:
             pos = (random.randint(10, game.tilemap.width*game.tilemap.tile_size-10), 
                    random.randint(10, game.tilemap.height*game.tilemap.tile_size-10))
@@ -19,10 +19,17 @@ class Enemy(Entity):
         super().__init__(game, pos)
         self.set_friction(200)
         self.target = target if target != None else game.player
+
+        self.max_health = max_health
+        self.health = max_health
         
     def update(self, dt):
         super().update(dt)
         self.weapon.update(dt)
+        
+        if self.health <= 0:
+            self.on_death()
+            self.game.EnemyList.remove(self)
 
     def on_death(self):
         # drop a coin on death
