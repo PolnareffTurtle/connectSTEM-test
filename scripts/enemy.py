@@ -19,7 +19,3 @@ class Enemy(Entity):
         if not hasattr(self.game, 'coins'):
             self.game.coins = []
         self.game.coins.append(coin)
-
-    def render(self, surf):
-        if self.alive:
-            surf.blit(self.game.assets['enemy'], self.pos)

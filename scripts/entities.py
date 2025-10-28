@@ -2,6 +2,7 @@ import pygame
 from scripts.weapon import Weapon
 
 class Entity:
+    #important
     def __init__(self,game,pos,image_key,atk=1,atk_spd=1):
         self.image = game.assets[image_key]
         self.mask = pygame.mask.from_surface(self.image)
