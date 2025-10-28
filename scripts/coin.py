@@ -3,6 +3,7 @@ from scripts.enums import ItemType
 import pygame
 
 class Coin(Item):
+    
     type = ItemType.COIN
     image_key = 'CoinSprite(TEMP)'
 

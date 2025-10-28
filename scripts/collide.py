@@ -7,10 +7,12 @@ class collide:
         self.pos = pygame.math.Vector2(pos)
         self.game = game
 
+#draws the Object at its position with an optional offset
     def render(self,screen,offset=(0,0)):
         rect = self.rect()
         screen.blit(self.image,(rect.x-offset[0],rect.y-offset[1]))
 
+#checks if the object collides with a given rectangle using AABB method, preserving float position
     def aabb_collide(self,rect: pygame.Rect) -> bool:
         return ( 
             self.pos.x - self.size[0]/2 < rect.right and

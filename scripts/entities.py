@@ -1,38 +1,22 @@
 import pygame
 from scripts.weapon import Weapon
-
+from scripts.collide import Collide
 sign = lambda x: (x>0) - (x<0)
 
-class Entity:
+class Entity(Collide):
 
     image_key = None
 
     def __init__(self,game,pos: tuple[float,float]):
-        self.image = game.assets[self.image_key]
-        self.size = self.image.get_size()
-        self.mask = pygame.mask.from_surface(self.image)
-        self.pos = pygame.math.Vector2(pos)
-        self.game = game
+        super().__init__(game, self.image_key, pos)
         self.velocity = pygame.math.Vector2(0,0)
         self.friction = 0
-    
-    def render(self,screen,offset=(0,0)):
-        rect = self.rect()
-        screen.blit(self.image,(rect.x-offset[0],rect.y-offset[1]))
-
+ 
     def set_velocity(self,velocity:pygame.math.Vector2):
         self.velocity = velocity
 
     def set_friction(self,friction:float):
         self.friction = friction 
-
-    def aabb_collide(self,rect: pygame.Rect) -> bool:
-        return ( 
-            self.pos.x - self.size[0]/2 < rect.right and
-            self.pos.x + self.size[0]/2 > rect.left and
-            self.pos.y - self.size[1]/2 < rect.bottom and
-            self.pos.y + self.size[1]/2 > rect.top
-        )
 
     def check_collisions(self,rects, prev_movement: tuple = (0,0)):
         # AABB collision detection without using rects (preserves float position since rects use integers)
@@ -81,9 +65,6 @@ class Entity:
             self.velocity = pygame.math.Vector2(0,0)
         if self.velocity.magnitude() == 0:
             self.pos = pygame.math.Vector2(round(self.pos.x),round(self.pos.y))
-
-    def rect(self):
-        return self.image.get_rect(center=(int(self.pos.x),int(self.pos.y)))
 
     #should be extended by subclasses
     def on_death(self):
