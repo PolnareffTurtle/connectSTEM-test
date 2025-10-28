@@ -11,7 +11,5 @@ class Coin(Item):
         self.value = value
 
     def pickup(self):
-        # Assuming 'picker' has an attribute 'currency' to hold the amount of coins
         self.game.currency += self.value
-        # Remove the coin from the game world
         self.game.CoinList.remove(self)
