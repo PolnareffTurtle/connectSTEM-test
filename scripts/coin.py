@@ -3,7 +3,7 @@ from scripts.enums import ItemType
 import pygame
 
 class Coin(Item):
-    
+
     type = ItemType.COIN
     image_key = 'CoinSprite(TEMP)'
 
@@ -11,6 +11,7 @@ class Coin(Item):
         super().__init__(game, startPos, autoPickup=True)
         self.value = value
 
+#should be called on item pickup
     def pickup(self):
         self.game.currency += self.value
         self.game.CoinList.remove(self)

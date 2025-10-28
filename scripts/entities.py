@@ -18,8 +18,8 @@ class Entity(Collide):
     def set_friction(self,friction:float):
         self.friction = friction 
 
+# AABB collision detection for tilemap
     def check_collisions(self,rects, prev_movement: tuple = (0,0)):
-        # AABB collision detection without using rects (preserves float position since rects use integers)
         for rect in rects:
             if self.aabb_collide(rect): 
                 if prev_movement[0] > 0:
@@ -31,6 +31,7 @@ class Entity(Collide):
                 elif prev_movement[1] < 0:
                     self.pos.y = rect.bottom + self.size[1]/2
 
+#override of the update method to include collision and movement
     def update(self, dt):
         tilemap = self.game.tilemap
         physics_rects = tilemap.physics_rects_around(self.pos)
@@ -45,12 +46,15 @@ class Entity(Collide):
         if self.pos.x - self.size[0]/2 < 0:
             self.pos.x = self.size[0]/2
             self.velocity.x = 0
+            
         if self.pos.x + self.size[0] > tilemap.width * tilemap.tile_size:
             self.pos.x = tilemap.width * tilemap.tile_size + self.size[0]/2
             self.velocity.x = 0
+
         if self.pos.y - self.size[1]/2 < 0:
             self.pos.y = self.size[1]/2
             self.velocity.y = 0
+
         if self.pos.y + self.size[1]/2 > tilemap.height * tilemap.tile_size:
             self.pos.y = tilemap.height * tilemap.tile_size + self.size[1]/2
             self.velocity.y = 0

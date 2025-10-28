@@ -1,5 +1,9 @@
 import pygame
-class collide:
+
+#this is effectively an abstract class: NEVER INSTANTIATE THIS DIRECTLY
+class Collide:
+
+# initializes the image, size, mask, position, and game reference (DON'T FOR GET TO ALWAYS CALL SUPER)
     def __init__(self, game, image_key, pos: tuple[float,float]):
         self.image = game.assets[image_key]
         self.size = self.image.get_size()
