@@ -6,24 +6,28 @@ from scripts.player import Player
 from scripts.enums import GameState
 from scripts.tilemap import Tilemap
 from random import choice
-
+from scripts.coin import Coin;
 class Game:
+    currency = 0
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((1280,720))
         self.display = pygame.Surface((320,180))
         self.clock = pygame.time.Clock()
         self.gamemode = GameState.GAME_RUNNING
+        self.CoinList = [];
         self.assets = {
             'player': load_image('player.png',alpha=True),
             'enemy': load_image('enemy.png',alpha=True),
             'tiles': spritesheet_to_surf_list(load_image('spritesheet.png',alpha=True),16,16,alpha=True,scale=1),
+            'CoinSprite(TEMP)': load_image('CoinSprite(TEMP).png',alpha=True),
         }
 
     def running(self):
         self.player = Player(self, (0,0))
         movement = [[0,0],[0,0]]  # [[left,right],[up,down]]
         EnemyList = []
+        self.CoinList = [Coin(self, (200,200), value=5)];
         self.tilemap = Tilemap(self,map=0)
 
         ### SPAWN ENTITIES FROM TILEMAP ###
@@ -94,8 +98,13 @@ class Game:
             for enemy in EnemyList:
                 enemy.render(self.display,offset=render_offset)
             
+            for coin in self.CoinList:
+                coin.render(self.display,offset=render_offset)
 
             self.screen.blit(pygame.transform.scale(self.display,self.screen.get_size()),(0,0))
+
+            text_surf = pygame.font.Font(None, 30).render(f'Currency: {self.currency}',True,'black')
+            self.screen.blit(text_surf,(10,10))
             pygame.display.update()
 
     def run(self):

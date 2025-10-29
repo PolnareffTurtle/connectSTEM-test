@@ -9,3 +9,7 @@ class WeaponType(Enum):
     PROJECTILE = 'projectile',
     LUNGE = 'lunge',
     NONE = 'none'
+
+class ItemType(Enum):
+    NONE = 'none',
+    COIN = 'coin'
