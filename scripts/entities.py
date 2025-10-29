@@ -1,11 +1,13 @@
 import pygame
 from scripts.weapon import Weapon
+from scripts.utils import Text
 
 sign = lambda x: (x>0) - (x<0)
 
 class Entity:
 
     image_key = None
+    max_health = 100
 
     def __init__(self,game,pos: tuple[float,float]):
         self.image = game.assets[self.image_key]
@@ -15,10 +17,26 @@ class Entity:
         self.game = game
         self.velocity = pygame.math.Vector2(0,0)
         self.friction = 0
+        self.health = self.max_health
     
     def render(self,screen,offset=(0,0)):
         rect = self.rect()
         screen.blit(self.image,(rect.x-offset[0],rect.y-offset[1]))
+        self.draw_health_bar(screen,offset)
+
+    def draw_health_bar(self, screen, offset=(0,0)):
+        bar_width = self.size[0]
+        bar_height = 5
+        health_ratio = self.health / self.max_health
+        green_width = int(bar_width * health_ratio)
+        bar_x = self.pos[0] - self.size[0] // 2
+        bar_y = self.pos[1] - self.size[1] // 2 - bar_height - 2
+        red_bar_rect = pygame.Rect(bar_x-offset[0], bar_y-offset[1], bar_width, bar_height)
+        green_bar_rect = pygame.Rect(bar_x-offset[0], bar_y-offset[1], green_width, bar_height)
+        pygame.draw.rect(screen, (255, 0, 0), red_bar_rect)
+        pygame.draw.rect(screen, (0, 255, 0), green_bar_rect)
+        #Text(f"{self.health}", font_size=10, color=(255,255,255)).render(screen, (bar_x + bar_width // 2 - offset[0]-3, bar_y - offset[1]-4))
+        
 
     def set_velocity(self,velocity:pygame.math.Vector2):
         self.velocity = velocity
@@ -40,12 +58,16 @@ class Entity:
             if self.aabb_collide(rect):
                 if prev_movement[0] > 0:
                     self.pos.x = rect.left - self.size[0]/2
+                    self.velocity.x = 0
                 elif prev_movement[0] < 0:
                     self.pos.x = rect.right + self.size[0]/2
+                    self.velocity.x = 0
                 if prev_movement[1] > 0:
                     self.pos.y = rect.top - self.size[1]/2
+                    self.velocity.y = 0
                 elif prev_movement[1] < 0:
                     self.pos.y = rect.bottom + self.size[1]/2
+                    self.velocity.y = 0
 
     def update(self, dt):
         tilemap = self.game.tilemap
@@ -61,14 +83,14 @@ class Entity:
         if self.pos.x - self.size[0]/2 < 0:
             self.pos.x = self.size[0]/2
             self.velocity.x = 0
-        if self.pos.x + self.size[0] > tilemap.width * tilemap.tile_size:
-            self.pos.x = tilemap.width * tilemap.tile_size + self.size[0]/2
+        if self.pos.x + self.size[0]/2 > tilemap.width * tilemap.tile_size:
+            self.pos.x = tilemap.width * tilemap.tile_size - self.size[0]/2
             self.velocity.x = 0
         if self.pos.y - self.size[1]/2 < 0:
             self.pos.y = self.size[1]/2
             self.velocity.y = 0
         if self.pos.y + self.size[1]/2 > tilemap.height * tilemap.tile_size:
-            self.pos.y = tilemap.height * tilemap.tile_size + self.size[1]/2
+            self.pos.y = tilemap.height * tilemap.tile_size - self.size[1]/2
             self.velocity.y = 0
 
         # apply friction

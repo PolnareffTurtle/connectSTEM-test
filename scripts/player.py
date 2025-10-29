@@ -11,7 +11,6 @@ class Player(Entity):
         super().__init__(game, pos)
         self.speed = 100
         self.max_health = 100
-        self.health = 100
 
     def update(self,movement: tuple[int,int],dt):
 

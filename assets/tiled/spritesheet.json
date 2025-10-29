@@ -74,6 +74,31 @@
          "type":"physics"
         }, 
         {
+         "id":16,
+         "properties":[
+                {
+                 "name":"entity",
+                 "type":"string",
+                 "value":"enemy"
+                }, 
+                {
+                 "name":"subclass",
+                 "type":"string",
+                 "value":"circle"
+                }],
+         "type":"spawn"
+        }, 
+        {
+         "id":17,
+         "properties":[
+                {
+                 "name":"entity",
+                 "type":"string",
+                 "value":"player"
+                }],
+         "type":"spawn"
+        }, 
+        {
          "id":18,
          "type":"physics"
         }, 
@@ -88,6 +113,36 @@
         {
          "id":21,
          "type":"physics"
+        }, 
+        {
+         "id":22,
+         "properties":[
+                {
+                 "name":"entity",
+                 "type":"string",
+                 "value":"enemy"
+                }, 
+                {
+                 "name":"subclass",
+                 "type":"string",
+                 "value":"lunge"
+                }],
+         "type":"spawn"
+        }, 
+        {
+         "id":23,
+         "properties":[
+                {
+                 "name":"entity",
+                 "type":"string",
+                 "value":"enemy"
+                }, 
+                {
+                 "name":"subclass",
+                 "type":"string",
+                 "value":"random"
+                }],
+         "type":"spawn"
         }],
  "tilewidth":16,
  "type":"tileset",
