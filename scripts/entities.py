@@ -1,5 +1,6 @@
 import pygame
 from scripts.weapon import Weapon
+from scripts.utils import Text
 
 class HealthBar:
     def __init__(self, entity):
@@ -24,6 +25,7 @@ sign = lambda x: (x>0) - (x<0)
 class Entity:
 
     image_key = None
+    max_health = 100
 
     def __init__(self,game,pos: tuple[float,float]):
         self.image = game.assets[self.image_key]
@@ -62,12 +64,16 @@ class Entity:
             if self.aabb_collide(rect):
                 if prev_movement[0] > 0:
                     self.pos.x = rect.left - self.size[0]/2
+                    self.velocity.x = 0
                 elif prev_movement[0] < 0:
                     self.pos.x = rect.right + self.size[0]/2
+                    self.velocity.x = 0
                 if prev_movement[1] > 0:
                     self.pos.y = rect.top - self.size[1]/2
+                    self.velocity.y = 0
                 elif prev_movement[1] < 0:
                     self.pos.y = rect.bottom + self.size[1]/2
+                    self.velocity.y = 0
 
     def update(self, dt):
         tilemap = self.game.tilemap
@@ -83,14 +89,14 @@ class Entity:
         if self.pos.x - self.size[0]/2 < 0:
             self.pos.x = self.size[0]/2
             self.velocity.x = 0
-        if self.pos.x + self.size[0] > tilemap.width * tilemap.tile_size:
-            self.pos.x = tilemap.width * tilemap.tile_size + self.size[0]/2
+        if self.pos.x + self.size[0]/2 > tilemap.width * tilemap.tile_size:
+            self.pos.x = tilemap.width * tilemap.tile_size - self.size[0]/2
             self.velocity.x = 0
         if self.pos.y - self.size[1]/2 < 0:
             self.pos.y = self.size[1]/2
             self.velocity.y = 0
         if self.pos.y + self.size[1]/2 > tilemap.height * tilemap.tile_size:
-            self.pos.y = tilemap.height * tilemap.tile_size + self.size[1]/2
+            self.pos.y = tilemap.height * tilemap.tile_size - self.size[1]/2
             self.velocity.y = 0
 
         # apply friction
