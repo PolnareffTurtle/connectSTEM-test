@@ -25,6 +25,11 @@ class Enemy(Entity):
         
     def update(self, dt):
         super().update(dt)
+
+        if self.health <= 0:
+            if self in self.game.entities:
+                self.game.entities.remove(self)
+            return
         self.weapon.update(dt)
 
         if self.health <= 0:

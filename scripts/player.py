@@ -11,12 +11,17 @@ class Player(Entity):
         super().__init__(game, pos)
         self.speed = 100
         self.max_health = 100
-        self.health = 100
 
     def update(self,movement: tuple[int,int],dt):
         self.set_velocity(pygame.math.Vector2(movement))
         if self.velocity.magnitude() != 0:
             self.velocity.scale_to_length(self.speed)
+
+        if self.health <= 0:
+            self.set_velocity(pygame.math.Vector2(0, 0))
+            super().update(dt)
+            return
+
         
         for coin in self.game.CoinList:
             if self.aabb_collide(coin.rect()):

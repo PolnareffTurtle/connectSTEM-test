@@ -37,3 +37,13 @@ def spritesheet_to_surf_list(spritesheet, sprite_w, sprite_h, alpha=False, scale
                 surf = pygame.transform.scale_by(surf, scale)
             surf_list.append(surf)
     return surf_list
+
+class Text:
+    def __init__(self, text, font_size=20, font = None, color=(255,255,255)):
+        self.font = pygame.font.Font('assets/fonts/pixel.ttf', font_size)
+        self.color = color
+        self.text = text
+        self.image = self.font.render(self.text, True, self.color)
+
+    def render(self, screen, pos):
+        screen.blit(self.image, pos)

@@ -5,6 +5,7 @@ from scripts.enemy import Enemy, CircleEnemy, LungeEnemy
 from scripts.player import Player
 from scripts.enums import GameState
 from scripts.tilemap import Tilemap
+from random import choice
 from scripts.coin import Coin;
 class Game:
     currency = 0
@@ -25,13 +26,27 @@ class Game:
     def running(self):
         self.player = Player(self, (0,0))
         movement = [[0,0],[0,0]]  # [[left,right],[up,down]]
-        EnemyList = [Enemy(self, (100,100)),Enemy(self, (200,150)),Enemy(self, (150,50))]
+        EnemyList = []
         self.CoinList = [Coin(self, (200,200), value=5)];
         self.tilemap = Tilemap(self,map=0)
 
+        ### SPAWN ENTITIES FROM TILEMAP ###
+        for spawn in self.tilemap.spawns:
+            if spawn['entity'] == 'enemy':
+                if spawn.get('subclass') == 'circle':
+                    EnemyList.append(CircleEnemy(self, spawn['pos']))
+                elif spawn.get('subclass') == 'lunge':
+                    EnemyList.append(LungeEnemy(self, spawn['pos']))
+                elif spawn.get('subclass') == 'random':
+                    EnemyClass = choice([CircleEnemy, LungeEnemy])
+                    EnemyList.append(EnemyClass(self, spawn['pos']))
+                else:
+                    EnemyList.append(Enemy(self, spawn['pos']))
+            elif spawn['entity'] == 'player':
+                self.player.pos = pygame.math.Vector2(spawn['pos'])
+
         # this makes the player centered on the screen
         offset = self.player.pos - pygame.math.Vector2(self.display.get_size()) / 2
-        EnemyList = [CircleEnemy(self, (100,100)),CircleEnemy(self, (200,150)),CircleEnemy(self, (150,50)), LungeEnemy(self,(300,200))]
         while self.gamemode == GameState.GAME_RUNNING:
 
             dt = self.clock.tick(60) / 1000
@@ -100,4 +115,3 @@ class Game:
 if __name__ == '__main__':
     game = Game()
     game.run()
-
