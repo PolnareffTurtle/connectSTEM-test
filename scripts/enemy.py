@@ -2,11 +2,11 @@ import pygame
 from scripts.entities import Entity
 from scripts.enums import WeaponType
 from scripts.weapon import Weapon, CircleWeapon, LungeWeapon
-from scripts.coin import Coin
 import random
+from scripts.economy import Coin
+from random import randint
 
 class Enemy(Entity):
-
     image_key = 'enemy'
     range = 100
     value = 1
@@ -27,8 +27,9 @@ class Enemy(Entity):
         super().update(dt)
 
         if self.health <= 0:
-            if self in self.game.entities:
-                self.game.entities.remove(self)
+            if self in self.game.EnemyList:
+                self.on_death()
+                self.game.EnemyList.remove(self)
             return
         self.weapon.update(dt)
 
@@ -38,8 +39,11 @@ class Enemy(Entity):
 
     def on_death(self):
         # drop a coin on death
-        coin = Coin(self.game, pos=self.pos, value=self.value)
-        self.game.CoinList.append(coin)
+        drop_pos = (self.pos[0] + randint(-3, 3), self.pos[1] + randint(-3, 3))
+        coin = Coin(self.game, drop_pos)
+        if not hasattr(self.game, 'coins'):
+            self.game.coins = []
+        self.game.coins.append(coin)
 
 
 class CircleEnemy(Enemy):

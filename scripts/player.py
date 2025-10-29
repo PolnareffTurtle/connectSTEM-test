@@ -23,8 +23,8 @@ class Player(Entity):
             return
 
         
-        for coin in self.game.CoinList:
-            if self.aabb_collide(coin.rect()):
-                coin.pickup()
+        for coin in self.game.coins:
+            if not coin.collected and self.aabb_collide(coin.rect()):
+                coin.collect()
         
         super().update(dt)
