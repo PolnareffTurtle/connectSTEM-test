@@ -19,7 +19,8 @@ class Entity(Collide):
         self.friction = friction 
 
 # AABB collision detection for tilemap
-    def check_collisions(self,rects, prev_movement: tuple = (0,0)):
+# note: do we want to 
+    def check_wall_collisions(self,rects, prev_movement: tuple = (0,0)):
         for rect in rects:
             if self.aabb_collide(rect): 
                 if prev_movement[0] > 0:
@@ -38,15 +39,15 @@ class Entity(Collide):
 
         # apply velocity and check for collisions (x and y separately)
         self.pos.x += self.velocity.x * dt
-        self.check_collisions(physics_rects, (self.velocity.x * dt,0))
+        self.check_wall_collisions(physics_rects, (self.velocity.x * dt,0))
         self.pos.y += self.velocity.y * dt
-        self.check_collisions(physics_rects, (0,self.velocity.y * dt))
+        self.check_wall_collisions(physics_rects, (0,self.velocity.y * dt))
 
-        # check for bounds using self.pos and self.size
+        # turn of velocity if collision with world bounds or something idk. I don't rly know if we need this given we have check_wall_collisions
         if self.pos.x - self.size[0]/2 < 0:
             self.pos.x = self.size[0]/2
             self.velocity.x = 0
-            
+
         if self.pos.x + self.size[0] > tilemap.width * tilemap.tile_size:
             self.pos.x = tilemap.width * tilemap.tile_size + self.size[0]/2
             self.velocity.x = 0

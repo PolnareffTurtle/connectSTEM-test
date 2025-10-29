@@ -26,7 +26,7 @@ class Enemy(Entity):
     def update(self, dt):
         super().update(dt)
         self.weapon.update(dt)
-        
+
         if self.health <= 0:
             self.on_death()
             self.game.EnemyList.remove(self)
@@ -35,6 +35,7 @@ class Enemy(Entity):
         # drop a coin on death
         coin = Coin(self.game, pos=self.pos, value=self.value)
         self.game.CoinList.append(coin)
+
 
 class CircleEnemy(Enemy):
 
