@@ -1,6 +1,6 @@
 # economy.py
 import pygame
-from scripts.entities import Entity
+from scripts.item import Item
 
 class Wallet:
     def __init__(self):
@@ -16,9 +16,12 @@ class Wallet:
         return False
 
 
-class Coin(Entity):
+class Coin(Item):
+
+    image_key = 'coin'
+
     def __init__(self, game, pos, value=5):
-        super().__init__(game, pos, 'coin')
+        super().__init__(game, pos, autoPickup=True)
         self.value = value
         self.collected = False
 
@@ -27,6 +30,6 @@ class Coin(Entity):
             self.collected = True
             self.game.wallet.add(self.value)
 
-    def render(self, screen):
+    def render(self, screen, offset):
         if not self.collected:
-            screen.blit(self.image, self.rect)
+            super().render(screen, offset)
