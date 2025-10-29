@@ -2,6 +2,24 @@ import pygame
 from scripts.weapon import Weapon
 from scripts.utils import Text
 
+class HealthBar:
+    def __init__(self, entity):
+        self.entity = entity
+    def draw(self, screen, offset):
+        health_ratio = max(0, min(1, self.entity.health / self.entity.max_health))
+        width = self.entity.size[0]
+        x = int(self.entity.pos.x - width/2 - offset[0])
+        y = int(self.entity.pos.y - self.entity.size[1]/2 - 10 - offset[1])
+
+        pygame.draw.rect(screen, (0, 0, 0), (x, y, width, 5))
+
+        r = int(255 * (1 - health_ratio))
+        g = int(255 * health_ratio)
+        b = 0
+        color = (r, g, b)
+        pygame.draw.rect(screen, color, (x+1, y+1, int((width-2) * health_ratio), 3))
+
+
 sign = lambda x: (x>0) - (x<0)
 
 class Entity:
@@ -17,26 +35,14 @@ class Entity:
         self.game = game
         self.velocity = pygame.math.Vector2(0,0)
         self.friction = 0
+        self.max_health = 100
         self.health = self.max_health
-    
+        self.healthbar = HealthBar(self)
+
     def render(self,screen,offset=(0,0)):
         rect = self.rect()
         screen.blit(self.image,(rect.x-offset[0],rect.y-offset[1]))
-        self.draw_health_bar(screen,offset)
-
-    def draw_health_bar(self, screen, offset=(0,0)):
-        bar_width = self.size[0]
-        bar_height = 5
-        health_ratio = self.health / self.max_health
-        green_width = int(bar_width * health_ratio)
-        bar_x = self.pos[0] - self.size[0] // 2
-        bar_y = self.pos[1] - self.size[1] // 2 - bar_height - 2
-        red_bar_rect = pygame.Rect(bar_x-offset[0], bar_y-offset[1], bar_width, bar_height)
-        green_bar_rect = pygame.Rect(bar_x-offset[0], bar_y-offset[1], green_width, bar_height)
-        pygame.draw.rect(screen, (255, 0, 0), red_bar_rect)
-        pygame.draw.rect(screen, (0, 255, 0), green_bar_rect)
-        #Text(f"{self.health}", font_size=10, color=(255,255,255)).render(screen, (bar_x + bar_width // 2 - offset[0]-3, bar_y - offset[1]-4))
-        
+        self.healthbar.draw(screen, offset)
 
     def set_velocity(self,velocity:pygame.math.Vector2):
         self.velocity = velocity
