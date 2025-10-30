@@ -7,8 +7,8 @@ class Player(Entity):
     
     image_key = 'player'
 
-    def __init__(self,game,pos):
-        super().__init__(game, pos)
+    def __init__(self,scene,pos):
+        super().__init__(scene, pos)
         self.speed = 100
         self.max_health = 100
 
@@ -23,7 +23,7 @@ class Player(Entity):
             return
 
         
-        for coin in self.game.coins:
+        for coin in self.scene.coins:
             if not coin.collected and self.aabb_collide(coin.rect()):
                 coin.collect()
         
