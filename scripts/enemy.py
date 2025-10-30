@@ -1,7 +1,9 @@
+import math
+
 import pygame
 from scripts.entities import Entity
 from scripts.enums import WeaponType
-from scripts.weapon import Weapon, CircleWeapon, LungeWeapon
+from scripts.weapon import Weapon, CircleWeapon, LungeWeapon, RotateWeapon
 import random
 from scripts.economy import Coin
 from random import randint
@@ -26,16 +28,16 @@ class Enemy(Entity):
     def update(self, dt):
         super().update(dt)
 
-        if self.health <= 0:
-            if self in self.scene.EnemyList:
-                self.on_death()
-                self.scene.EnemyList.remove(self)
-            return
-        self.weapon.update(dt)
-
-        if self.health <= 0:
-            self.on_death()
-            self.scene.EnemyList.remove(self)
+        # if self.health <= 0:
+        #     if self in self.scene.EnemyList:
+        #         self.on_death()
+        #         self.scene.EnemyList.remove(self)
+        #     return
+        # self.weapon.update(dt)
+        #
+        # if self.health <= 0:
+        #     self.on_death()
+        #     self.scene.EnemyList.remove(self)
 
     def on_death(self):
         # drop a coin on death
@@ -85,3 +87,30 @@ class LungeEnemy(Enemy):
                 direction = direction.normalize()
             self.weapon.use(self, direction=direction)
         super().update(dt)
+
+
+class RotateEnemy(Enemy):
+
+    def __init__(self, scene, pos = None, target: Entity = None):
+        super().__init__(scene, pos, target)
+
+        self.weapon = RotateWeapon(attack_power = 5, attack_speed = 1.5, radius = 45, rotation_speed = 240)
+        self.value = 5
+
+    def update(self, dt):
+        super().update(dt)
+        self.weapon.update(dt)
+        self.weapon.attack(self, targets = [self.target])
+
+    def render(self, screen, offset = (0, 0)):
+        center = self.pos - offset
+
+        # circle path
+        pygame.draw.circle(screen, (0, 0, 0), (int(center.x), int(center.y)), int(self.weapon.radius), 1)
+
+        # draw blade (line + circle)
+        blade_pos = pygame.Vector2(center.x + math.cos(math.radians(self.weapon.angle)) * self.weapon.radius, center.y + math.sin(math.radians(self.weapon.angle)) * self.weapon.radius)
+
+        pygame.draw.circle(screen, (255, 50, 50), (int(blade_pos.x), int(blade_pos.y)), 3)
+        pygame.draw.line(screen, (255, 100, 100), blade_pos, center, 2)
+        super().render(screen, offset)

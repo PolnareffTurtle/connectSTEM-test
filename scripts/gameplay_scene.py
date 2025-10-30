@@ -3,7 +3,7 @@ from scripts.scene import Scene
 from scripts.player import Player
 from scripts.tilemap import Tilemap
 from scripts.economy import Coin
-from scripts.enemy import CircleEnemy, LungeEnemy, Enemy
+from scripts.enemy import CircleEnemy, LungeEnemy, Enemy, RotateEnemy
 from random import choice
 from scripts.enums import GameState
 from scripts.utils import Text
@@ -26,7 +26,7 @@ class GameplayScene(Scene):
         for spawn in self.tilemap.spawns:
             if spawn['entity'] == 'enemy':
                 if spawn.get('subclass') == 'circle':
-                    self.EnemyList.append(CircleEnemy(self, spawn['pos']))
+                    self.EnemyList.append(RotateEnemy(self, spawn['pos']))
                 elif spawn.get('subclass') == 'lunge':
                     self.EnemyList.append(LungeEnemy(self, spawn['pos']))
                 elif spawn.get('subclass') == 'random':
