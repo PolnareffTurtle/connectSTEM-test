@@ -28,8 +28,8 @@ class Entity(Collide):
     image_key = None
     max_health = 100
 
-    def __init__(self,game,pos: tuple[float,float]):
-        super().__init__(game, self.image_key, pos)
+    def __init__(self,scene,pos: tuple[float,float]):
+        super().__init__(scene, self.image_key, pos)
         self.velocity = pygame.math.Vector2(0,0)
         self.friction = 0
         self.max_health = 100
@@ -67,7 +67,7 @@ class Entity(Collide):
 
 #override of the update method to include collision and movement
     def update(self, dt):
-        tilemap = self.game.tilemap
+        tilemap = self.scene.tilemap
         physics_rects = tilemap.physics_rects_around(self.pos)
 
         # apply velocity and check for collisions (x and y separately)

@@ -11,14 +11,14 @@ class Enemy(Entity):
     range = 100
     value = 1
 
-    def __init__(self,game, pos=None, target:Entity=None, max_health: int = 100):
+    def __init__(self,scene, pos=None, target:Entity=None, max_health: int = 100):
         if not pos:
-            pos = (random.randint(10, game.tilemap.width*game.tilemap.tile_size-10), 
-                   random.randint(10, game.tilemap.height*game.tilemap.tile_size-10))
+            pos = (random.randint(10, scene.tilemap.width*scene.tilemap.tile_size-10), 
+                   random.randint(10, scene.tilemap.height*scene.tilemap.tile_size-10))
 
-        super().__init__(game, pos)
+        super().__init__(scene, pos)
         self.set_friction(200)
-        self.target = target if target != None else game.player
+        self.target = target if target != None else scene.player
 
         self.max_health = max_health
         self.health = max_health
@@ -27,29 +27,29 @@ class Enemy(Entity):
         super().update(dt)
 
         if self.health <= 0:
-            if self in self.game.EnemyList:
+            if self in self.scene.EnemyList:
                 self.on_death()
-                self.game.EnemyList.remove(self)
+                self.scene.EnemyList.remove(self)
             return
         self.weapon.update(dt)
 
         if self.health <= 0:
             self.on_death()
-            self.game.EnemyList.remove(self)
+            self.scene.EnemyList.remove(self)
 
     def on_death(self):
         # drop a coin on death
         drop_pos = (self.pos[0] + randint(-3, 3), self.pos[1] + randint(-3, 3))
-        coin = Coin(self.game, drop_pos)
-        if not hasattr(self.game, 'coins'):
-            self.game.coins = []
-        self.game.coins.append(coin)
+        coin = Coin(self.scene, drop_pos)
+        if not hasattr(self.scene, 'coins'):
+            self.scene.coins = []
+        self.scene.coins.append(coin)
 
 
 class CircleEnemy(Enemy):
 
-    def __init__(self,game, pos=None, target:Entity=None):
-        super().__init__(game, pos, target)
+    def __init__(self,scene, pos=None, target:Entity=None):
+        super().__init__(scene, pos, target)
         self.weapon = CircleWeapon(attack_power=10, attack_speed=1, attack_radius=30)
         self.value = 3
 
@@ -73,8 +73,8 @@ class CircleEnemy(Enemy):
 
 class LungeEnemy(Enemy):
 
-    def __init__(self,game, pos=None, target:Entity=None):
-        super().__init__(game, pos, target)
+    def __init__(self,scene, pos=None, target:Entity=None):
+        super().__init__(scene, pos, target)
         self.weapon = LungeWeapon(attack_power=200, attack_speed=0.3)
         self.value = 5
 
