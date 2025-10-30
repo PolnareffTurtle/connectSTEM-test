@@ -4,8 +4,9 @@ from scripts.economy import Coin
 from random import randint
 
 class Enemy(Entity):
+    image_key = 'enemy' #added to define spirte key
     def __init__(self, game, pos, health = 6, attack = 1):
-        super().__init__(game, pos, 'enemy')
+        super().__init__(game, pos)
         self.health = health #scales w/ wave # later
         self.attack = attack #can scale for harder enemies
         self.alive = True

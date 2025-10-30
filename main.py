@@ -22,13 +22,15 @@ class Game:
         }
 
         #economy setup
-        self.wallet = Wallet()  # create player wallet
+        self.wallet = Wallet()  #create player wallet
+        self.wave = 1
+        self.enemies = Enemy.create_wave(self, wave_number = self.wave, count = 3) #start 1st wave
+        self.coins = []
 
 
     def running(self):
         self.player = Player(self, (0,0))
         movement = [[0,0],[0,0]]  # [[left,right],[up,down]]
-        self.EnemyList = []
         self.tilemap = Tilemap(self,map=0)
         self.coins = [  # example coin placements (you can adjust)
             Coin(self, (60, 60), value=5),
@@ -38,14 +40,14 @@ class Game:
         for spawn in self.tilemap.spawns:
             if spawn['entity'] == 'enemy':
                 if spawn.get('subclass') == 'circle':
-                    self.EnemyList.append(CircleEnemy(self, spawn['pos']))
+                    self.enemies.append(CircleEnemy(self, spawn['pos']))
                 elif spawn.get('subclass') == 'lunge':
-                    self.EnemyList.append(LungeEnemy(self, spawn['pos']))
+                    self.enemies.append(LungeEnemy(self, spawn['pos']))
                 elif spawn.get('subclass') == 'random':
                     EnemyClass = choice([CircleEnemy, LungeEnemy])
-                    self.EnemyList.append(EnemyClass(self, spawn['pos']))
+                    self.enemies.append(EnemyClass(self, spawn['pos']))
                 else:
-                    self.EnemyList.append(Enemy(self, spawn['pos']))
+                    self.enemies.append(Enemy(self, spawn['pos']))
             elif spawn['entity'] == 'player':
                 self.player.pos = pygame.math.Vector2(spawn['pos'])
 
@@ -90,10 +92,16 @@ class Game:
             render_offset = tuple(map(int,offset))
 
             ### UPDATES ###
-            for enemy in self.EnemyList:
-                if enemy.pos.distance_to(self.player.pos) < 50 and enemy.health > 0:
-                    enemy.health = 0  # instant kill for testing
+            #enemy logic
+            for enemy in self.enemies:
+                if enemy.alive and self.player.rect.colliderect(enemy.rect.inflate(10, 10)):
+                    enemy.die()
                 enemy.update(dt)
+            #wave progression
+            if all(not e.alive for e in self.enemies):
+                self.wave += 1
+                count = int(min(3 + .8 * self.wave + .04 * self.wave ** 2, 28))
+                self.enemies = Enemy.create_wave(self, wave_number = self.wave, count = count)
                 
             ### RENDERING ###
             self.display.fill('aquamarine')
@@ -101,33 +109,27 @@ class Game:
             
             self.player.render(self.display,offset=render_offset)
 
-            #coin collection logic
+            #COIN LOGIC
             for coin in self.coins:
-                if not coin.collected and self.player.aabb_collide(coin.rect()):
-                    coin.collect()
+               if not coin.collected and self.player.rect.colliderect(coin.rect):
+                   coin.collect()
+               coin.render(self.display, offset = render_offset)
 
-            #ender everything
-            for coin in self.coins:
-                coin.render(self.display,offset=render_offset)  # draw uncollected coins
-
-            for enemy in self.EnemyList:
-                enemy.render(self.display,offset=render_offset)
-
-            """for enemy in self.EnemyList:
-                if enemy.alive and abs(enemy.pos[0] - self.player.pos[0]) < 10 and abs(
-                        enemy.pos[1] - self.player.pos[1]) < 10:
-                    enemy.die()"""
-
+            #render enemy
+            for enemy in self.enemies:
+               enemy.render(self.display, offset = render_offset)
             #render wallet bal
-            """font = pygame.font.SysFont(None, 24)
+            font = pygame.font.SysFont(None, 24)
             text = font.render(f"Coins: {self.wallet.balance}", True, (0, 0, 0))
-            self.display.blit(text, (5, 5))"""
+            self.display.blit(text, (5, 5))
 
             self.clock.tick(60)
             self.screen.blit(pygame.transform.scale(self.display,self.screen.get_size()),(0,0))
 
-            text_surf = pygame.font.Font(None, 30).render(f'Currency: {self.wallet.balance}',True,'black')
-            self.screen.blit(text_surf,(10,10))
+            #display wallet + wave info
+            font = pygame.font.SysFont(None, 24)
+            text = font.render(f"Coins: {self.wallet.balance}' | Wave : {self.wave}", True,'black')
+            self.screen.blit(text,(10,10))
             pygame.display.update()
 
     def run(self):
