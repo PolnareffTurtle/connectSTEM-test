@@ -40,6 +40,9 @@ class GameplayScene(Scene):
         # this makes the player centered on the screen
         self.offset = self.player.pos - pygame.math.Vector2(self.game.display.get_size()) / 2
 
+        self.wave = 1
+        self.EnemyList = Enemy.create_wave(self, wave_number = self.wave, count = 3)
+        
     def handle_events(self, events):
         for event in events:
             if event.type == pygame.KEYDOWN:
@@ -67,11 +70,17 @@ class GameplayScene(Scene):
         self.player.update(net_movement,dt)
         self.offset = self.player.pos - pygame.math.Vector2(self.game.display.get_size()) / 2
         self.render_offset = tuple(map(int,self.offset))
-        for enemy in self.EnemyList:
+        for enemy in self.EnemyList: 
+            if enemy.pos.distance_to(self.player.pos) < 50:
+                enemy.health = 0
             enemy.update(dt)
         for coin in self.coins:
             if not coin.collected and self.player.aabb_collide(coin.rect()):
                 coin.collect()
+        #wave progression
+        if not self.EnemyList:
+            self.wave += 1
+            self.EnemyList = Enemy.create_wave(self, wave_number = self.wave)
         
     def render(self, screen):
         screen.fill('aquamarine')
@@ -81,5 +90,5 @@ class GameplayScene(Scene):
             coin.render(screen,offset=self.render_offset)  # draw uncollected coins
         for enemy in self.EnemyList:
             enemy.render(screen,offset=self.render_offset)
-        text_surf = Text(f'Currency: {self.game.wallet.balance}',10,color='black')
+        text_surf = Text(f'Currency: {self.game.wallet.balance}    Wave: {self.wave}',10,color='black')
         text_surf.render(screen,(5,5))

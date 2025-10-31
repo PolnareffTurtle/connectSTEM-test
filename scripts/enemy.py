@@ -13,7 +13,7 @@ class Enemy(Entity):
     range = 100
     value = 1
 
-    def __init__(self,scene, pos=None, target:Entity=None, max_health: int = 100):
+    def __init__(self,scene, pos=None, target:Entity=None, max_health: int = 100, attack: int = 5):
         if not pos:
             pos = (random.randint(10, scene.tilemap.width*scene.tilemap.tile_size-10), 
                    random.randint(10, scene.tilemap.height*scene.tilemap.tile_size-10))
@@ -24,6 +24,7 @@ class Enemy(Entity):
 
         self.max_health = max_health
         self.health = max_health
+        self.attack = attack
         
     def update(self, dt):
         super().update(dt)
@@ -42,12 +43,28 @@ class Enemy(Entity):
         if not hasattr(self.scene, 'coins'):
             self.scene.coins = []
         self.scene.coins.append(coin)
+    
+    @staticmethod
+    def create_wave(scene, wave_number, count = None):
+        if not count:
+            count = int(min(3 + .8 * wave_number + .04 * wave_number ** 2, 28))
+        enemies = [] #to create and return list of enemies per wave
+        for i in range(count):
+            #scales attack & health w/ wave
+            health = 5 + wave_number * 2
+            attack = 1 + wave_number//2
+            #random spawn positions
+            pos = (randint(50, scene.game.display.get_width() - 50),
+                   randint(50, scene.game.display.get_height() -50))
+
+            enemies.append(RotateEnemy(scene, pos, max_health=health, attack=attack))
+        return enemies
 
 
 class CircleEnemy(Enemy):
 
-    def __init__(self,scene, pos=None, target:Entity=None):
-        super().__init__(scene, pos, target)
+    def __init__(self,scene, pos=None, max_health: int = 100, target:Entity=None, attack: int = 5):
+        super().__init__(scene, pos, target, max_health=max_health, attack=attack)
         self.weapon = CircleWeapon(attack_power=10, attack_speed=1, attack_radius=30)
         self.value = 3
 
@@ -71,8 +88,8 @@ class CircleEnemy(Enemy):
 
 class LungeEnemy(Enemy):
 
-    def __init__(self,scene, pos=None, target:Entity=None):
-        super().__init__(scene, pos, target)
+    def __init__(self,scene, pos=None, target:Entity=None,  max_health: int = 100, attack: int = 5):
+        super().__init__(scene, pos, target, max_health, attack)
         self.weapon = LungeWeapon(attack_power=200, attack_speed=0.3)
         self.value = 5
 
@@ -87,8 +104,8 @@ class LungeEnemy(Enemy):
 
 class RotateEnemy(Enemy):
 
-    def __init__(self, scene, pos = None, target: Entity = None):
-        super().__init__(scene, pos, target)
+    def __init__(self, scene, pos = None, target: Entity = None,  max_health: int = 100, attack: int = 5):
+        super().__init__(scene, pos, target, max_health=max_health, attack=attack)
 
         self.weapon = RotateWeapon(attack_power = 5, attack_speed = 1.5, radius = 45, rotation_speed = 240)
         self.value = 5
@@ -110,3 +127,5 @@ class RotateEnemy(Enemy):
         pygame.draw.circle(screen, (255, 50, 50), (int(blade_pos.x), int(blade_pos.y)), 3)
         pygame.draw.line(screen, (255, 100, 100), blade_pos, center, 2)
         super().render(screen, offset)
+
+
