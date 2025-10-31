@@ -28,16 +28,12 @@ class Enemy(Entity):
     def update(self, dt):
         super().update(dt)
 
-        # if self.health <= 0:
-        #     if self in self.scene.EnemyList:
-        #         self.on_death()
-        #         self.scene.EnemyList.remove(self)
-        #     return
-        # self.weapon.update(dt)
-        #
-        # if self.health <= 0:
-        #     self.on_death()
-        #     self.scene.EnemyList.remove(self)
+        if self.health <= 0:
+            if self in self.scene.EnemyList:
+                self.on_death()
+                self.scene.EnemyList.remove(self)
+            return
+        self.weapon.update(dt)
 
     def on_death(self):
         # drop a coin on death
