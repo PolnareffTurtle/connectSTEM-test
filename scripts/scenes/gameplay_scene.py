@@ -1,12 +1,14 @@
 import pygame
-from scripts.scene import Scene
-from scripts.player import Player
+from scripts.scenes.scene import Scene
+from scripts.entities.player import Player
 from scripts.tilemap import Tilemap
-from scripts.economy import Coin
-from scripts.enemy import CircleEnemy, LungeEnemy, Enemy, RotateEnemy
+from scripts.item import Coin
+from scripts.entities.enemy import CircleEnemy, LungeEnemy, Enemy, RotateEnemy
 from random import choice
 from scripts.enums import GameState
 from scripts.utils import Text
+from scripts.button import NavButton
+from scripts.economy import Wallet
 
 class GameplayScene(Scene):
 
@@ -18,11 +20,19 @@ class GameplayScene(Scene):
         self.movement = [[0,0],[0,0]]  # [[left,right],[up,down]]
         self.EnemyList = []
         self.tilemap = Tilemap(self,map=0)
+        self.wallet = Wallet()  # create player wallet
         self.coins = [  # example coin placements (you can adjust)
             Coin(self, (60, 60), value=5),
             Coin(self, (200, 120), value=10)
         ]
+        pause_button_rect = pygame.rect.Rect(0,0,20,20)
+        pause_button_rect.topright = (self.game.display.get_width()-10,10)
+        button_font = pygame.font.Font('assets/fonts/pixel.ttf',10)
+        self.buttons = [
+            NavButton(pause_button_rect,'P',button_font,(255,255,255,200),(0,0,0),GameState.PAUSE,border_radius=3,alt_color=(200,200,200,200)),
+        ]
         ### SPAWN ENTITIES FROM TILEMAP ###
+        #TODO: Change the enemylist wave thing to use this instead!
         for spawn in self.tilemap.spawns:
             if spawn['entity'] == 'enemy':
                 if spawn.get('subclass') == 'circle':
@@ -45,6 +55,8 @@ class GameplayScene(Scene):
         
     def handle_events(self, events):
         for event in events:
+            for button in self.buttons:
+                button.update(event,self.game)
             if event.type == pygame.KEYDOWN:
                 if event.key in [pygame.K_LEFT,pygame.K_a]:
                     self.movement[0][0] = 1
@@ -70,9 +82,9 @@ class GameplayScene(Scene):
         self.player.update(net_movement,dt)
         self.offset = self.player.pos - pygame.math.Vector2(self.game.display.get_size()) / 2
         self.render_offset = tuple(map(int,self.offset))
-        for enemy in self.EnemyList: 
-            if enemy.pos.distance_to(self.player.pos) < 50:
-                enemy.health = 0
+        for enemy in self.EnemyList:
+            if enemy.pos.distance_to(self.player.pos) < self.player.range and enemy.health > 0:
+                enemy.health -= 1  # testing
             enemy.update(dt)
         for coin in self.coins:
             if not coin.collected and self.player.aabb_collide(coin.rect()):
@@ -90,5 +102,7 @@ class GameplayScene(Scene):
             coin.render(screen,offset=self.render_offset)  # draw uncollected coins
         for enemy in self.EnemyList:
             enemy.render(screen,offset=self.render_offset)
-        text_surf = Text(f'Currency: {self.game.wallet.balance}    Wave: {self.wave}',10,color='black')
-        text_surf.render(screen,(5,5))
+        text_surf = Text(f'Currency: {self.wallet.balance}    Wave: {self.wave}    Enemies  Left: {len(self.EnemyList)}',10,color='black')
+        text_surf.render(screen,topleft=(5,5))
+        for button in self.buttons:
+            button.draw(screen)
