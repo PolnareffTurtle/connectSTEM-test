@@ -3,7 +3,7 @@ import pygame
 # Abstract class for all the screens in our game. 
 class Scene:
 
-    gamestate = None
+    running = True
     
     def __init__(self, game):
         self.game = game
@@ -14,7 +14,7 @@ class Scene:
     def update(self, dt):
         pass
 
-    def render(self):
+    def render(self, screen):
         pass
 
 

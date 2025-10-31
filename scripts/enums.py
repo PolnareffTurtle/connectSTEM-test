@@ -1,8 +1,10 @@
 from enum import Enum
 
 class GameState(Enum):
-    GAME_MENU = 0
-    GAMEPLAY = 1
+    MAIN_MENU = 'main_menu'
+    GAMEPLAY = 'gameplay'
+    PAUSE = 'pause'
+    DEATH = 'death'
 
 class WeaponType(Enum):
     CIRCLE = 'circle',

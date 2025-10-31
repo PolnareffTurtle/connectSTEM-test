@@ -1,12 +1,12 @@
 import math
 
 import pygame
-from scripts.entities import Entity
+from scripts.entities.entities import Entity
 from scripts.enums import WeaponType
 from scripts.weapon import Weapon, CircleWeapon, LungeWeapon, RotateWeapon
 import random
-from scripts.economy import Coin
-from random import randint
+from scripts.item import Coin
+from random import randint,choice
 
 class Enemy(Entity):
     image_key = 'enemy'
@@ -57,7 +57,8 @@ class Enemy(Entity):
             pos = (randint(50, scene.game.display.get_width() - 50),
                    randint(50, scene.game.display.get_height() -50))
 
-            enemies.append(RotateEnemy(scene, pos, max_health=health, attack=attack))
+            EnemyType = choice((CircleEnemy,LungeEnemy,RotateEnemy))
+            enemies.append(EnemyType(scene, pos, max_health=health, attack=attack))
         return enemies
 
 
@@ -119,7 +120,7 @@ class RotateEnemy(Enemy):
         center = self.pos - offset
 
         # circle path
-        pygame.draw.circle(screen, (0, 0, 0), (int(center.x), int(center.y)), int(self.weapon.radius), 1)
+        #pygame.draw.circle(screen, (0, 0, 0), (int(center.x), int(center.y)), int(self.weapon.radius), 1)
 
         # draw blade (line + circle)
         blade_pos = pygame.Vector2(center.x + math.cos(math.radians(self.weapon.angle)) * self.weapon.radius, center.y + math.sin(math.radians(self.weapon.angle)) * self.weapon.radius)

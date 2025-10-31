@@ -101,7 +101,7 @@ class Entity(Collide):
         if self.velocity.magnitude() < 1:
             self.velocity = pygame.math.Vector2(0,0)
         if self.velocity.magnitude() == 0:
-            self.pos = pygame.math.Vector2(round(self.pos.x),round(self.pos.y))
+            self.pos = pygame.math.Vector2(int(self.pos.x),int(self.pos.y))
 
     #should be extended by subclasses
     def on_death(self):
