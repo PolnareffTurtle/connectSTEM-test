@@ -60,3 +60,33 @@ class LungeWeapon(Weapon):
 
     def attack(self, user, direction, targets: list = []):
         user.velocity = direction * self.attack_power
+
+
+
+class RotateWeapon(Weapon):
+    type = enums.WeaponType.ROTATE
+
+    def __init__(self, attack_power, attack_speed, radius = 40, rotation_speed = 180):
+        super().__init__(attack_power, attack_speed)
+        self.radius = radius
+        self.rotation_speed = rotation_speed
+        self.angle = 0
+        self.last_attack = 0
+
+    def update(self, delta_time: float):
+        super().update(delta_time)
+        # rotate
+        self.angle = (self.angle + self.rotation_speed * delta_time) % 360
+
+    def attack(self, user, targets: list = []):
+        # translate to coords
+        weapon_pos = pygame.Vector2(user.pos.x + math.cos(math.radians(self.angle)) * self.radius, user.pos.y + math.sin(math.radians(self.angle)) * self.radius)
+
+        for target in targets:
+            if target.pos.distance_to(weapon_pos) <= 15: # need better collision detection
+                now = pygame.time.get_ticks()
+
+                if now - self.last_attack > 250: # hard coded as well
+                    target.health -= self.attack_power
+                    target.health = max(0, target.health)
+                    self.last_attack = now

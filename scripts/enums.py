@@ -8,6 +8,7 @@ class WeaponType(Enum):
     CIRCLE = 'circle',
     PROJECTILE = 'projectile',
     LUNGE = 'lunge',
+    ROTATE = 'rotate',
     NONE = 'none'
 
 class ItemType(Enum):
