@@ -8,6 +8,7 @@ from scripts.scenes.pause_scene import PauseScene
 from scripts.scenes.death_scene import DeathScene
 from scripts.scenes.scene import Scene
 from scripts.music import Music
+import asyncio
 
 class Game:
     def __init__(self):
@@ -27,6 +28,9 @@ class Game:
             GameState.PAUSE: PauseScene,
             GameState.DEATH: DeathScene
         }
+        self.scene = None
+        self.scene_stack = [] # for pause/resume
+        self.next_scene = GameState.MAIN_MENU
     
     @property
     def scale(self):
@@ -39,10 +43,8 @@ class Game:
                 return state
         return None
 
-    def run_scene(self, scene_type: Scene):
-        self.scene = scene_type(self)
-        Music.play(self.gamestate)
-        while self.scene.running:
+    async def run_scene(self):
+        while self.scene.running and self.next_scene is None:
 
             dt = self.clock.tick(60) / 1000
 
@@ -58,16 +60,40 @@ class Game:
             self.scene.render(self.display)
 
             self.clock.tick(60)
+            await asyncio.sleep(0)
             self.screen.blit(pygame.transform.scale(self.display,self.screen.get_size()),(0,0))
             pygame.display.update()
 
     def change_scene(self,scene_type: GameState):
-        prev = self.scene
-        scene = self.scene_factories[scene_type]
-        self.run_scene(scene)
-        self.scene = prev # when run_scene finishes, return to the original scene
+        self.next_scene = scene_type
 
+    async def run(self):
+        SceneType = self.scene_factories[self.next_scene]
+        self.next_scene = None
+        self.scene = SceneType(self)
+        Music.play(self.gamestate)
+        while True:
+            
+            await self.run_scene()
 
+            # if pause scene ends, go back to previous
+            if not self.scene.running and self.scene_stack:
+                self.scene = self.scene_stack.pop()
+            # if another scene was requested
+            elif self.next_scene:
+                # if pausing, remember the current one
+                if isinstance(self.scene, GameplayScene) and self.next_scene == GameState.PAUSE:
+                    self.scene_stack.append(self.scene)
+                SceneType = self.scene_factories[self.next_scene]
+                self.scene = SceneType(self)
+                Music.play(self.gamestate)
+            else:
+                raise Exception('Next Scene not found')
+
+            self.next_scene = None
+            
+            await asyncio.sleep(0)
+            
 if __name__ == '__main__':
     game = Game()
-    game.run_scene(MainMenuScene)
+    asyncio.run(game.run())
