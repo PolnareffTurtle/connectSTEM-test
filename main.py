@@ -7,6 +7,7 @@ from scripts.scenes.main_menu_scene import MainMenuScene
 from scripts.scenes.pause_scene import PauseScene
 from scripts.scenes.death_scene import DeathScene
 from scripts.scenes.scene import Scene
+from scripts.music import Music
 
 class Game:
     def __init__(self):
@@ -40,12 +41,14 @@ class Game:
 
     def run_scene(self, scene_type: Scene):
         self.scene = scene_type(self)
+        Music.play(self.gamestate)
         while self.scene.running:
 
             dt = self.clock.tick(60) / 1000
 
             events = pygame.event.get()
             for event in events:
+                Music.update(event,self.gamestate)
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
