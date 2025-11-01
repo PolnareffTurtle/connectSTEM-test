@@ -2,7 +2,7 @@
 
 This is a game created by students in CS @ [ConnectSTEM](https://connectstem.org/)!
 
-Check out our game online here (add itch.io link here in the future)
+Check out our game online [here](https://polnareffturtle07.itch.io/ghost-survival)
 
 ## How to run locally
 
