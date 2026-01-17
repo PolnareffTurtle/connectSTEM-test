@@ -17,6 +17,7 @@ class GameplayScene(Scene):
     def __init__(self, game):
         super().__init__(game)
         self.player = Player(self, (0,0))
+        self.projectiles = []
         self.movement = [[0,0],[0,0]]  # [[left,right],[up,down]]
         self.EnemyList = []
         self.tilemap = Tilemap(self,map=0)
@@ -52,7 +53,7 @@ class GameplayScene(Scene):
 
         self.wave = 1
         self.EnemyList = Enemy.create_wave(self, wave_number = self.wave, count = 3)
-        
+
     def handle_events(self, events):
         for event in events:
             for button in self.buttons:
@@ -66,7 +67,7 @@ class GameplayScene(Scene):
                     self.movement[1][0] = 1
                 if event.key in [pygame.K_DOWN,pygame.K_s]:
                     self.movement[1][1] = 1
-                
+
             if event.type == pygame.KEYUP:
                 if event.key in [pygame.K_LEFT,pygame.K_a]:
                     self.movement[0][0] = 0
@@ -77,11 +78,21 @@ class GameplayScene(Scene):
                 if event.key in [pygame.K_DOWN,pygame.K_s]:
                     self.movement[1][1] = 0
 
+    def add_projectile(self, projectile):
+        self.projectiles.append(projectile)
+
+    def remove_projectile(self, projectile):
+        if projectile in self.projectiles:
+            self.projectiles.remove(projectile)
+
     def update(self, dt):
         net_movement = (self.movement[0][1]-self.movement[0][0],self.movement[1][1]-self.movement[1][0])
         self.player.update(net_movement,dt)
         self.offset = self.player.pos - pygame.math.Vector2(self.game.display.get_size()) / 2
         self.render_offset = tuple(map(int,self.offset))
+        # update projectiles
+        for projectile in self.projectiles[:]:
+            projectile.update(dt)
         for enemy in self.EnemyList:
             if enemy.pos.distance_to(self.player.pos) < self.player.range and enemy.health > 0:
                 enemy.health -= 1  # testing
@@ -93,10 +104,13 @@ class GameplayScene(Scene):
         if not self.EnemyList:
             self.wave += 1
             self.EnemyList = Enemy.create_wave(self, wave_number = self.wave)
-        
+
     def render(self, screen):
         screen.fill('aquamarine')
         self.tilemap.render(screen,offset=self.render_offset)
+        # draw projectiles
+        for projectile in self.projectiles:
+            projectile.render(screen, offset=self.render_offset)
         self.player.render(screen,offset=self.render_offset)
         for coin in self.coins:
             coin.render(screen,offset=self.render_offset)  # draw uncollected coins
