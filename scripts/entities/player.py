@@ -1,6 +1,7 @@
 import pygame
 from scripts.entities.entities import Entity
 from scripts.enums import WeaponType,GameState
+from scripts.weaponmanager import WeaponManager
 
 class Player(Entity):
     
@@ -11,6 +12,7 @@ class Player(Entity):
         super().__init__(scene, pos)
         self.speed = 200
         self.max_health = 100
+        self.weapon_manager = WeaponManager(self)
 
     def update(self,movement: tuple[int,int],dt):
         self.set_velocity(pygame.math.Vector2(movement))
@@ -21,6 +23,12 @@ class Player(Entity):
             self.scene.game.change_scene(GameState.DEATH)
             return
 
+
+        self.weapon_manager.update(dt)
+        keys = pygame.key.get_pressed()
+        self.weapon_manager.handle_input(keys, self.scene.EnemyList)
+        if self.weapon_manager.active_weapon_type == WeaponType.ROTATE:
+            self.weapon_manager.use_weapon(self.scene.EnemyList)
         
         for coin in self.scene.coins:
             if not coin.collected and self.aabb_collide(coin.rect()):
@@ -28,11 +36,9 @@ class Player(Entity):
         
         super().update(dt)
     
+    def handle_event(self, event):
+        self.weapon_manager.handle_event(event)
+    
     def render(self, screen, offset):
-        # poison attack for now
-        transparent_surf = pygame.Surface((self.range*2, self.range*2), pygame.SRCALPHA)
-        pygame.draw.circle(transparent_surf, (109, 122, 38,170), (self.range,self.range), self.range)
-        screen.blit(transparent_surf, (self.pos.x - self.range - offset[0], self.pos.y - self.range - offset[1]))
+        self.weapon_manager.render_weapon_visual(screen, offset)
         super().render(screen, offset)
-        
-
