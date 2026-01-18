@@ -21,6 +21,7 @@ class Game:
             'enemy': load_image('enemy.png',alpha=True),
             'tiles': spritesheet_to_surf_list(load_image('spritesheet.png',alpha=True),16,16,alpha=True,scale=1),
             'coin': load_image('coin.png',alpha=True),
+            #add a bullet asset here
         }
         self.scene_factories = {
             GameState.MAIN_MENU: MainMenuScene,
