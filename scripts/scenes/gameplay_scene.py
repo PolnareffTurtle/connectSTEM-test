@@ -58,6 +58,9 @@ class GameplayScene(Scene):
         for event in events:
             for button in self.buttons:
                 button.update(event,self.game)
+
+            self.player.handle_event(event)
+            
             if event.type == pygame.KEYDOWN:
                 if event.key in [pygame.K_LEFT,pygame.K_a]:
                     self.movement[0][0] = 1
@@ -94,8 +97,6 @@ class GameplayScene(Scene):
         for projectile in self.projectiles[:]:
             projectile.update(dt)
         for enemy in self.EnemyList:
-            if enemy.pos.distance_to(self.player.pos) < self.player.range and enemy.health > 0:
-                enemy.health -= 1  # testing
             enemy.update(dt)
         for coin in self.coins:
             if not coin.collected and self.player.aabb_collide(coin.rect()):
@@ -120,3 +121,4 @@ class GameplayScene(Scene):
         text_surf.render(screen,topleft=(5,5))
         for button in self.buttons:
             button.draw(screen)
+        
