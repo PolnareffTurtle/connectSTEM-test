@@ -1,14 +1,9 @@
 import math
 import pygame
-from scripts import enums
+from scripts.enums import WeaponType
 import random
 
-
-# This isn't limited to traditional "weapons" 
-# but instead is a classifier for how the entity attacks
-
 class Weapon:
-
     type = None
 
     def __init__(self,attack_power: int = 1,attack_speed: float = 1):
@@ -35,8 +30,7 @@ class Weapon:
             target.health = max(0, target.health)
 
 class CircleWeapon(Weapon):
-
-    type = enums.WeaponType.CIRCLE
+    type = WeaponType.CIRCLE
 
     def __init__(self, attack_power, attack_speed, attack_radius=25):
         super().__init__(attack_power, attack_speed)
@@ -49,25 +43,38 @@ class CircleWeapon(Weapon):
             if self.attack_radius >= user.pos.distance_to(target.pos):
                 in_range.append(target)
         super().attack(user, targets=in_range)
-        
+    
+    def render(self,screen,user,offset=(0,0)):
+        pygame.draw.circle(
+            screen,
+            (173, 216, 230),
+            (int(user.pos.x - offset[0]), int(user.pos.y - offset[1])),
+            self.attack_radius,
+            1
+        )
+        if self.last_attack and self.last_attack + 500 >pygame.time.get_ticks():
+            surface = pygame.Surface((self.attack_radius*2, self.attack_radius*2),pygame.SRCALPHA)
+            alpha = 200 - int(200 * (pygame.time.get_ticks() - self.last_attack)/500)
+            pygame.draw.circle(surface, (0,100,255,alpha),
+                               (self.attack_radius,self.attack_radius), 
+                               self.attack_radius)
+            screen.blit(surface, (user.pos.x - offset[0]-self.attack_radius, 
+                                 user.pos.y - offset[1]-self.attack_radius))
 
 class LungeWeapon(Weapon):
+    type = WeaponType.LUNGE
 
-    type = enums.WeaponType.LUNGE
-
-    def __init__(self, attack_power, attack_speed):
-        super().__init__(attack_power, attack_speed)
+    def __init__(self, attack_power,attack_speed):
+        super().__init__(attack_power,attack_speed)
 
     def attack(self, user, direction, targets: list = []):
         user.velocity = direction * self.attack_power
 
-
-
 class RotateWeapon(Weapon):
-    type = enums.WeaponType.ROTATE
+    type = WeaponType.ROTATE
 
-    def __init__(self, attack_power, attack_speed, radius = 40, rotation_speed = 180):
-        super().__init__(attack_power, attack_speed)
+    def __init__(self,attack_power,attack_speed,radius = 40,rotation_speed = 180):
+        super().__init__(attack_power,attack_speed)
         self.radius = radius
         self.rotation_speed = rotation_speed
         self.angle = 0
@@ -75,10 +82,13 @@ class RotateWeapon(Weapon):
 
     def update(self, delta_time: float):
         super().update(delta_time)
-        # rotate
         self.angle = (self.angle + self.rotation_speed * delta_time) % 360
 
-    def attack(self, user, targets: list = []):
+
+    def use(self, user,direction: pygame.Vector2 = None,targets: list = []):
+        self.attack(user, targets)
+
+    def attack(self,user,targets: list = []):
         # translate to coords
         weapon_pos = pygame.Vector2(user.pos.x + math.cos(math.radians(self.angle)) * self.radius, user.pos.y + math.sin(math.radians(self.angle)) * self.radius)
 
@@ -90,3 +100,11 @@ class RotateWeapon(Weapon):
                     target.health -= self.attack_power
                     target.health = max(0, target.health)
                     self.last_attack = now
+    
+    def render(self, screen, user, offset=(0, 0)):
+        weapon_x = user.pos.x + math.cos(math.radians(self.angle)) * self.radius
+        weapon_y = user.pos.y + math.sin(math.radians(self.angle)) * self.radius
+        center = (int(user.pos.x - offset[0]), int(user.pos.y - offset[1]))
+        blade_pos = (int(weapon_x - offset[0]), int(weapon_y - offset[1]))
+        pygame.draw.circle(screen, (128, 128, 128), blade_pos, 5)
+        pygame.draw.line(screen, (150, 150, 150), center, blade_pos, 2)
