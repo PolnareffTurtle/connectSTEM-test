@@ -13,7 +13,7 @@ class Enemy(Entity):
     range = 100
     value = 1
 
-    def __init__(self,scene, pos=None, target:Entity=None, max_health: int = 100, attack: int = 5):
+    def __init__(self,scene, pos=None, target:Entity=None, max_health: int = 100, attack: int = 5, level: int = 1):
         if not pos:
             pos = (random.randint(10, scene.tilemap.width*scene.tilemap.tile_size-10), 
                    random.randint(10, scene.tilemap.height*scene.tilemap.tile_size-10))
@@ -25,6 +25,7 @@ class Enemy(Entity):
         self.max_health = max_health
         self.health = max_health
         self.attack = attack
+        self.level = level
         
     def update(self, dt):
         super().update(dt)
@@ -50,24 +51,25 @@ class Enemy(Entity):
             count = int(min(3 + .8 * wave_number + .04 * wave_number ** 2, 28))
         enemies = [] #to create and return list of enemies per wave
         for i in range(count):
-            #scales attack & health w/ wave
-            health = 5 + wave_number * 2
-            attack = 1 + wave_number//2
-            #random spawn positions
-            pos = (randint(50, scene.game.display.get_width() - 50),
-                   randint(50, scene.game.display.get_height() -50))
+            # random spawn positions (across whole map rather than visible screen)
+            pos = (randint(10, scene.tilemap.width * scene.tilemap.tile_size - 10),
+                   randint(10, scene.tilemap.height * scene.tilemap.tile_size - 10))
 
             EnemyType = choice((CircleEnemy,LungeEnemy,RotateEnemy))
-            enemies.append(EnemyType(scene, pos, max_health=health, attack=attack))
+            enemies.append(EnemyType(scene, pos, level=wave_number))
         return enemies
 
 
 class CircleEnemy(Enemy):
 
-    def __init__(self,scene, pos=None, max_health: int = 100, target:Entity=None, attack: int = 5):
-        super().__init__(scene, pos, target, max_health=max_health, attack=attack)
-        self.weapon = CircleWeapon(attack_power=10, attack_speed=1, attack_radius=30)
-        self.value = 3
+    def __init__(self,scene, pos=None, target:Entity=None, level: int = 1):
+        # diff scaling for each enemy type
+        attack = int((level - 1) * 0.5 + 10)
+        max_health = 5 + (level - 1) * 2
+
+        super().__init__(scene, pos, target, max_health=max_health, attack=attack, level=level)
+        self.weapon = CircleWeapon(attack_power=attack, attack_speed=1, attack_radius=30)
+        self.value = 1 + self.level // 2
 
     def update(self, dt):
         self.weapon.use(self, targets=[self.target])
@@ -81,18 +83,22 @@ class CircleEnemy(Enemy):
             surface = pygame.Surface((self.weapon.attack_radius*2,self.weapon.attack_radius*2),pygame.SRCALPHA)
             alpha = 200 - int(200 * (pygame.time.get_ticks() - self.weapon.last_attack) / 500)
             pygame.draw.circle(surface, (255,0,0,alpha), 
-                               (self.weapon.attack_radius,self.weapon.attack_radius), 
+                               (self.weapon.attack_radius,self.weapon.attack_radius),
                                self.weapon.attack_radius)
             screen.blit(surface, self.pos-offset-(self.weapon.attack_radius,self.weapon.attack_radius))
         super().render(screen,offset)
-    
+
 
 class LungeEnemy(Enemy):
 
-    def __init__(self,scene, pos=None, target:Entity=None,  max_health: int = 100, attack: int = 5):
-        super().__init__(scene, pos, target, max_health, attack)
-        self.weapon = LungeWeapon(attack_power=200, attack_speed=0.3)
-        self.value = 5
+    def __init__(self,scene, pos=None, target:Entity=None,  level: int = 1):
+        attack = int((level - 1) * 5 + 10)
+        max_health = 5 + (level - 1) * 2
+
+        super().__init__(scene, pos, target, max_health=max_health, attack=attack, level=level)
+        # not actually hurting player; attack power determines speed
+        self.weapon = LungeWeapon(attack_power=attack, attack_speed=0.3)
+        self.value = int(3 + self.level * 0.5)
 
     def update(self, dt):
         direction = self.target.pos - self.pos # pygame.Vector2
@@ -105,15 +111,16 @@ class LungeEnemy(Enemy):
 
 class RotateEnemy(Enemy):
 
-    def __init__(self, scene, pos = None, target: Entity = None,  max_health: int = 100, attack: int = 5):
-        super().__init__(scene, pos, target, max_health=max_health, attack=attack)
+    def __init__(self, scene, pos = None, target: Entity = None,  level: int = 1):
+        attack = int((level - 1) * 0.5 + 5)
+        max_health = 5 + (level - 1) * 2
 
-        self.weapon = RotateWeapon(attack_power = 5, attack_speed = 1.5, radius = 45, rotation_speed = 240)
-        self.value = 5
+        super().__init__(scene, pos, target, max_health=max_health, attack=attack, level=level)
+        self.weapon = RotateWeapon(attack_power = attack, attack_speed = 1.5, radius = 45, rotation_speed = 240)
+        self.value = int(3 + level * 0.5)
 
     def update(self, dt):
         super().update(dt)
-        self.weapon.update(dt)
         self.weapon.attack(self, targets = [self.target])
 
     def render(self, screen, offset = (0, 0)):
