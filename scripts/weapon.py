@@ -62,13 +62,15 @@ class Weapon:
         if self.cooldown < 0:
             self.cooldown = 0
 
-    def use(self, user, direction: pygame.Vector2 = None, targets: list = []):
+    def use(self, user, direction: pygame.Vector2 = None, targets: list = None):
+        targets = targets or []
         if self.cooldown <= 0:
             self.cooldown = 1 / self.attack_speed
             self.last_attack = pygame.time.get_ticks()
             self.attack(user, direction, targets)
 
-    def handle_input(self, user, direction=None, targets: list = []):
+    def handle_input(self, user, direction=None, targets: list = None):
+        targets = targets or []
         mouse_buttons = pygame.mouse.get_pressed()
         if not mouse_buttons[0]:
             return
@@ -97,7 +99,70 @@ class Weapon:
         else:
             self.use(user, direction_vec, targets)
 
-    def attack(self, user, direction=None, targets: list = []):
+    def get_aim_direction(self, user):
+        scene = getattr(user, "scene", None)
+        if scene is None:
+            return None, None
+
+        mx, my = pygame.mouse.get_pos()
+
+        sx, sy = scene.game.scale
+        mx /= sx
+        my /= sy
+
+        ro = getattr(scene, "render_offset", (0, 0))
+        world_mouse = pygame.Vector2(mx + ro[0], my + ro[1])
+
+        direction_vec = world_mouse - user.pos
+        if direction_vec.length_squared() == 0:
+            return None, world_mouse
+
+        return direction_vec.normalize(), world_mouse
+
+    def draw_orbit_aim_indicator(self, surface: pygame.Surface, user, length: float = 4.0, radius: float = 1.0):
+
+        scene = getattr(user, "scene", None)
+        if scene is None:
+            return
+
+        direction_vec, _ = self.get_aim_direction(user)
+        if direction_vec is None:
+            return
+
+        angle = math.atan2(direction_vec.y, direction_vec.x)
+        dir2 = pygame.Vector2(math.cos(angle), math.sin(angle))
+        perp = pygame.Vector2(-dir2.y, dir2.x)
+
+        # orbit around player
+        orbit_radius = 7.0
+        arrow_world = pygame.Vector2(
+            user.pos.x + dir2.x * orbit_radius,
+            user.pos.y + dir2.y * orbit_radius,
+        )
+
+        ro = getattr(scene, "render_offset", (0, 0))
+        center = pygame.Vector2(arrow_world.x - ro[0], arrow_world.y - ro[1])
+
+        tip = center + dir2 * length
+        tail = center - dir2 * (length * 0.55)
+        half_width = max(1.5, length * 0.3)
+
+        p_left = tail + perp * half_width
+        p_right = tail - perp * half_width
+
+        arrow_len = length * 0.25
+        arrow_width = half_width * 0.35
+
+        base = center + dir2 * arrow_len
+        left = base + perp * arrow_width
+        right = base - perp * arrow_width
+
+        line_w = 1
+        pygame.draw.line(surface, (0, 0, 0), tip, left, line_w)
+        pygame.draw.line(surface, (0, 0, 0), tip, right, line_w)
+
+    def attack(self, user, direction=None, targets: list = None):
+        targets = targets or []
         for target in targets:
             target.health -= self.attack_power
             target.health = max(0, target.health)
@@ -167,9 +232,9 @@ class Gun(Weapon):
         super().__init__(attack_power=attack_power, attack_speed=attack_speed)
         self.bullet_speed = bullet_speed
 
-    def attack(self, user, direction: pygame.Vector2 = None, targets: list = []):
+    def attack(self, user, direction: pygame.Vector2 = None, targets: list = None):
+        targets = targets or []
         if direction is None or direction.length_squared() == 0:
-            print('shot')
             return
 
         direction = direction.normalize()
