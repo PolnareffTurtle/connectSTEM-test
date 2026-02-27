@@ -24,11 +24,11 @@ class Player(Entity):
             self.scene.game.change_scene(GameState.DEATH)
             return
 
-
         self.weapon_manager.update(dt)
         keys = pygame.key.get_pressed()
-        self.weapon_manager.handle_input(keys, self.scene.EnemyList)
-        if self.weapon_manager.active_weapon_type == WeaponType.ROTATE:
+        self.weapon_manager.handle_input(keys,self.scene.EnemyList)
+        
+        if self.weapon_manager.needs_continuous_attack():
             self.weapon_manager.use_weapon(self.scene.EnemyList)
         
         for coin in self.scene.coins:
