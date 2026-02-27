@@ -1,6 +1,7 @@
 import pygame
 from scripts.entities.entities import Entity
-from scripts.enums import GameState
+from scripts.enums import WeaponType,GameState
+from scripts.weapon import Gun
 from scripts.weaponmanager import WeaponManager
 
 class Player(Entity):
@@ -34,6 +35,7 @@ class Player(Entity):
             if not coin.collected and self.aabb_collide(coin.rect()):
                 coin.collect()
         
+        
         super().update(dt)
     
     def handle_event(self, event):
@@ -42,3 +44,5 @@ class Player(Entity):
     def render(self, screen, offset):
         self.weapon_manager.render_weapon_visual(screen, offset)
         super().render(screen, offset)
+        
+
