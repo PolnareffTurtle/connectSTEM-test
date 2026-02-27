@@ -15,7 +15,7 @@ class MainMenuScene(Scene):
 
         self.buttons = [
             NavButton(play_button_rect,'Play',button_font,(255,255,255,200),(0,0,0),GameState.GAMEPLAY,border_radius=3,alt_color=(200,200,200,200)),
-            Button(option_button_rect,'Options',button_font,'white','black',border_radius=3)
+            NavButton(option_button_rect,'Options',button_font,'white','black',GameState.OPTIONS,border_radius=3,alt_color=(200,200,200,200)),
         ]
         
     def handle_events(self, events):

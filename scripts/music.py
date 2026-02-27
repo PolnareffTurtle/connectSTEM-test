@@ -16,7 +16,25 @@ class Music:
         GameState.GAMEPLAY: ['reed_flutes.ogg'],
         GameState.DEATH: ['sugar_plum_fairy.ogg'],
         GameState.PAUSE: None,
+        GameState.OPTIONS: ['waltz_of_flowers.ogg'],
     }
+    muted = False
+    @staticmethod
+    def mute():
+        Music.muted = True
+        pygame.mixer.music.set_volume(0)
+
+    @staticmethod
+    def unmute():
+        Music.muted = False
+        pygame.mixer.music.set_volume(1)
+
+    @staticmethod
+    def toggle_mute():
+        if Music.muted:
+            Music.unmute()
+        else:
+            Music.mute()
     queue = []
     NEXT = pygame.USEREVENT + 1
     pygame.mixer.music.set_endevent(NEXT)
@@ -32,7 +50,9 @@ class Music:
         
     @staticmethod
     def update(event, gamestate):
-        if gamestate == GameState.PAUSE:
+        if Music.muted:
+            pygame.mixer.music.set_volume(0)
+        elif gamestate == GameState.PAUSE:
             pygame.mixer.music.set_volume(0.4)
         else:
             pygame.mixer.music.set_volume(1)

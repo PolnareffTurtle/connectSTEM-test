@@ -5,6 +5,7 @@ class GameState(Enum):
     GAMEPLAY = 'gameplay'
     PAUSE = 'pause'
     DEATH = 'death'
+    OPTIONS = 'options'
 
 class WeaponType(Enum):
     CIRCLE = 'circle',

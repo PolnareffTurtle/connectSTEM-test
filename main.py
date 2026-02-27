@@ -1,5 +1,7 @@
 import pygame
 from sys import exit
+
+from scripts.scenes.options_menu_scene import OptionsMenuScene
 from scripts.utils import load_image,load_images,spritesheet_to_surf_list
 from scripts.enums import GameState
 from scripts.scenes.gameplay_scene import GameplayScene
@@ -27,7 +29,8 @@ class Game:
             GameState.MAIN_MENU: MainMenuScene,
             GameState.GAMEPLAY: GameplayScene,
             GameState.PAUSE: PauseScene,
-            GameState.DEATH: DeathScene
+            GameState.DEATH: DeathScene,
+            GameState.OPTIONS: OptionsMenuScene
         }
         self.scene = None
         self.scene_stack = [] # for pause/resume
