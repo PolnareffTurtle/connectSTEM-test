@@ -184,7 +184,7 @@ class RotateWeapon(Weapon):
 class Gun(Weapon):
 
 
-    type = getattr(enums.WeaponType, "GUN", None)
+    type = getattr(WeaponType, "GUN", None)
 
     def __init__(self, attack_speed: float = 5, attack_power: int = 1, bullet_speed: float = 600.0):
         super().__init__(attack_power=attack_power, attack_speed=attack_speed)
