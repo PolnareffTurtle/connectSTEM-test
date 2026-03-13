@@ -31,8 +31,8 @@ class Tile:
         self.rotation = rotation
 
 class Tilemap:
-    def __init__(self,game,map,tile_size=16):
-        self.game=game
+    def __init__(self,scene,map,tile_size=16):
+        self.scene=scene
         self.map=map
         self.tile_size = tile_size
         self.tilemap = dict()
@@ -47,10 +47,6 @@ class Tilemap:
 
         self.width = jsondata['width']
         self.height = jsondata['height']
-        
-        # set player x,y to whats defined in the tiled map properties
-        self.game.player.pos[0] = jsondata['properties'][0]['value'] * self.tile_size
-        self.game.player.pos[1] = jsondata['properties'][1]['value'] * self.tile_size
 
         for j,val in enumerate(jsondata['layers'][0]['data']):
             x = j % jsondata['width']
@@ -87,5 +83,5 @@ class Tilemap:
                 if (x, y) in self.tilemap:
                     tile = self.tilemap[(x, y)]
                     surf.blit(
-                        self.game.assets['tiles'][tile.index],
+                        self.scene.game.assets['tiles'][tile.index],
                         (tile.pos[0] * self.tile_size - offset[0], tile.pos[1] * self.tile_size - offset[1]))
