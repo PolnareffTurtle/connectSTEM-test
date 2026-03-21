@@ -3,13 +3,13 @@ import pygame
 #this is effectively an abstract class: NEVER INSTANTIATE THIS DIRECTLY
 class Collide:
 
-# initializes the image, size, mask, position, and game reference (DON'T FOR GET TO ALWAYS CALL SUPER)
-    def __init__(self, game, image_key, pos: tuple[float,float]):
-        self.image = game.assets[image_key]
+# initializes the image, size, mask, position, and scene reference (DON'T FOR GET TO ALWAYS CALL SUPER)
+    def __init__(self, scene, image_key, pos: tuple[float,float]):
+        self.image = scene.game.assets[image_key]
         self.size = self.image.get_size()
         self.mask = pygame.mask.from_surface(self.image)
         self.pos = pygame.math.Vector2(pos)
-        self.game = game
+        self.scene = scene
 
 #draws the Object at its position with an optional offset
     def render(self,screen,offset=(0,0)):
