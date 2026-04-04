@@ -5,7 +5,7 @@ from scripts.enums import WeaponType
 
 class Player(Entity):
     
-    image_key = 'player'
+    image_key = 'pstand'
 
     def __init__(self,game,pos):
         super().__init__(game, pos)

@@ -48,7 +48,7 @@ class Tilemap:
         self.width = jsondata['width']
         self.height = jsondata['height']
         
-        # set player x,y to whats defined in the tiled map properties
+        # set pstand x,y to whats defined in the tiled map properties
         self.game.player.pos[0] = jsondata['properties'][0]['value'] * self.tile_size
         self.game.player.pos[1] = jsondata['properties'][1]['value'] * self.tile_size
 
