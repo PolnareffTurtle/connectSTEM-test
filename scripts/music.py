@@ -19,6 +19,7 @@ class Music:
         GameState.OPTIONS: ['waltz_of_flowers.ogg'],
     }
     muted = False
+    volume = 1.0
     @staticmethod
     def mute():
         Music.muted = True
@@ -27,7 +28,7 @@ class Music:
     @staticmethod
     def unmute():
         Music.muted = False
-        pygame.mixer.music.set_volume(1)
+        pygame.mixer.music.set_volume(Music.volume)
 
     @staticmethod
     def toggle_mute():
@@ -46,16 +47,15 @@ class Music:
         Music.queue = [Music.ROOT_PATH + path for path in Music.gamestate_factory[gamestate]]
         pygame.mixer.music.load(Music.queue[0])
         Music.queue.append(Music.queue.pop(0))
+        pygame.mixer.music.set_volume(0 if Music.muted else Music.volume)
         pygame.mixer.music.play()
-        
+
     @staticmethod
     def update(event, gamestate):
         if Music.muted:
             pygame.mixer.music.set_volume(0)
-        elif gamestate == GameState.PAUSE:
-            pygame.mixer.music.set_volume(0.4)
         else:
-            pygame.mixer.music.set_volume(1)
+            pygame.mixer.music.set_volume(Music.volume)
         if event.type == Music.NEXT:
             pygame.mixer.music.queue(Music.queue[0])
             Music.queue.append(Music.queue.pop(0))

@@ -31,7 +31,8 @@ class OptionsMenuScene(Scene):
         self.slider_rect = pygame.Rect(0, 0, SLIDER_WIDTH, SLIDER_HEIGHT)
         self.slider_rect.midleft = (game.display.get_width() // 2 + 60, 40)
         self.slider_dragging = False
-        self.volume = pygame.mixer.music.get_volume() if pygame.mixer.get_init() else 1.0
+        self.volume = getattr(Music, 'volume', pygame.mixer.music.get_volume() if pygame.mixer.get_init() else 1.0)
+        self._apply_volume(self.volume)
 
         # Resolution
         self.show_resolution_menu = False
@@ -69,6 +70,15 @@ class OptionsMenuScene(Scene):
             NavButton(back_button_rect, 'Back', button_font, 'white', 'black', GameState.MAIN_MENU, border_radius=3, alt_color=(200, 200, 200, 200))
         ]
 
+    def _apply_volume(self, volume):
+        self.volume = max(0.0, min(volume, 1.0))
+
+        if hasattr(Music, 'volume'):
+            Music.volume = self.volume
+
+        if pygame.mixer.get_init():
+            pygame.mixer.music.set_volume(0 if getattr(Music, 'muted', False) else self.volume)
+
     def handle_events(self, events):
         for event in events:
             mouse_pos = pygame.mouse.get_pos()
@@ -98,8 +108,7 @@ class OptionsMenuScene(Scene):
                 if hit_rect.collidepoint(mouse_pos) or knob_rect.collidepoint(mouse_pos):
                     self.slider_dragging = True
                     relative_x = max(0, min(mouse_pos[0] - self.slider_rect.x, self.slider_rect.width))
-                    self.volume = relative_x / self.slider_rect.width
-                    pygame.mixer.music.set_volume(self.volume)
+                    self._apply_volume(relative_x / self.slider_rect.width)
 
                 if self.show_resolution_menu:
                     for res_btn, (w, h) in zip(self.resolution_buttons, self.resolution_options):
@@ -113,8 +122,7 @@ class OptionsMenuScene(Scene):
 
             elif event.type == pygame.MOUSEMOTION and self.slider_dragging:
                 relative_x = max(0, min(mouse_pos[0] - self.slider_rect.x, self.slider_rect.width))
-                self.volume = relative_x / self.slider_rect.width
-                pygame.mixer.music.set_volume(self.volume)
+                self._apply_volume(relative_x / self.slider_rect.width)
 
             for button in self.buttons:
                 button.update(event, self.game)
