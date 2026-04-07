@@ -19,6 +19,35 @@ class Game:
         self.display = pygame.Surface((320,180))
         self.clock = pygame.time.Clock()
         self.assets = {
+            #player
+            'pstand': load_images('pstand', alpha=True),
+            'pstand1': load_images('pstand1', alpha=True),
+            'pstand2': load_images('pstand2', alpha=True),
+            'pwalk': load_images('pwalk', alpha=True),
+            'pwalk1': load_images('pwalk1', alpha=True),
+
+            #crawler
+            'cattack': load_images('cattack', alpha=True),
+            'cshoot': load_images('cshoot', alpha=True),
+            'cstand1': load_images('cstand1', alpha=True),
+            'cstand2': load_images('cstand2', alpha=True),
+            'cwalk': load_images('cwalk', alpha=True),
+
+            #flyer
+            'ffly': load_images('ffly', alpha=True),
+            'fshootdow': load_images('fshootdow', alpha=True),
+            'fshootL': load_images('fshootL', alpha=True),
+            'fshootupp': load_images('fshootupp', alpha=True),
+
+            #sword
+            'sattack': load_images('sattack', alpha=True),
+            'sidle': load_images('sidle', alpha=True),
+            'sshoot': load_images('sshoot', alpha=True),
+
+            # TODO: (for joseph) Fix the tiles / tile numbering of the new tiles.
+            #tiles (currently renamed to tiled so that main.py can run)
+            'tiled': load_images('tiles', alpha=True), 
+
             'player': load_image('player.png',alpha=True),
             'enemy': load_image('enemy.png',alpha=True),
             'tiles': spritesheet_to_surf_list(load_image('spritesheet.png',alpha=True),16,16,alpha=True,scale=1),
