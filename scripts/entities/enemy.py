@@ -44,6 +44,9 @@ class Enemy(Entity):
         if not hasattr(self.scene, 'coins'):
             self.scene.coins = []
         self.scene.coins.append(coin)
+
+    def take_damage(self, damage):
+        self.health -= damage
     
     @staticmethod
     def create_wave(scene, wave_number, count = None):

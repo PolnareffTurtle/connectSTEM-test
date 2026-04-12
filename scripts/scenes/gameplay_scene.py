@@ -1,4 +1,6 @@
 import pygame
+
+from scripts.powerup import PowerUp
 from scripts.scenes.scene import Scene
 from scripts.entities.player import Player
 from scripts.tilemap import Tilemap
@@ -26,6 +28,7 @@ class GameplayScene(Scene):
             Coin(self, (60, 60), value=5),
             Coin(self, (200, 120), value=10)
         ]
+        self.powerups = []
         pause_button_rect = pygame.rect.Rect(0,0,20,20)
         pause_button_rect.topright = (self.game.display.get_width()-10,10)
         button_font = pygame.font.Font('assets/fonts/pixel.ttf',10)
@@ -71,6 +74,23 @@ class GameplayScene(Scene):
                 if event.key in [pygame.K_DOWN,pygame.K_s]:
                     self.movement[1][1] = 1
 
+                # for testing purposes
+                if event.key == pygame.K_1:
+                    self.powerups.append(PowerUp("speed", 5))
+                    self.powerups[-1].apply(self.player)
+                if event.key == pygame.K_2:
+                    self.powerups.append(PowerUp("shield", 8))
+                    self.powerups[-1].apply(self.player)
+                if event.key == pygame.K_3:
+                    self.powerups.append(PowerUp("coin_multiplier", 10))
+                    self.powerups[-1].apply(self.player, self.wallet)
+                if event.key == pygame.K_TAB:
+                    self.movement[0][0] = 0
+                    self.movement[0][1] = 0
+                    self.movement[1][0] = 0
+                    self.movement[1][1] = 0
+                    self.game.change_scene(GameState.POWERUP_SELECTION)
+
             if event.type == pygame.KEYUP:
                 if event.key in [pygame.K_LEFT,pygame.K_a]:
                     self.movement[0][0] = 0
@@ -105,6 +125,13 @@ class GameplayScene(Scene):
         if not self.EnemyList:
             self.wave += 1
             self.EnemyList = Enemy.create_wave(self, wave_number = self.wave)
+        for powerup in self.powerups:
+            if powerup.duration > 0:
+                powerup.duration -= dt
+                powerup.duration = max(powerup.duration, 0)
+            if powerup.duration <= 0:
+                powerup.remove(self.player, self.wallet)
+                self.powerups.remove(powerup)
 
     def render(self, screen):
         screen.fill('aquamarine')
@@ -119,6 +146,9 @@ class GameplayScene(Scene):
             enemy.render(screen,offset=self.render_offset)
         text_surf = Text(f'Currency: {self.wallet.balance}    Wave: {self.wave}    Enemies  Left: {len(self.EnemyList)}',10,color='black')
         text_surf.render(screen,topleft=(5,5))
+        coin_surf = Text(f'Coin Multiplier: x{self.wallet.multiplier}', 10, color='black')
+        coin_surf.render(screen,topleft=(5,15))
         for button in self.buttons:
             button.draw(screen)
-        
+        if self.player.has_shield:
+            pygame.draw.circle(screen, (0, 0, 255), (self.player.pos - self.render_offset), 12.5, 2)
