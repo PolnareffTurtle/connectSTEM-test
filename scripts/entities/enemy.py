@@ -12,8 +12,12 @@ class Enemy(Entity):
     image_key = 'enemy'
     range = 100
     value = 1
-
-    def __init__(self,scene, pos=None, target:Entity=None, max_health: int = 100, attack: int = 5):
+    def __init__(self,scene, 
+                 pos=None, 
+                 target:Entity=None, 
+                 max_health: int = 100, 
+                 attack: int = 5, 
+                 move_speed: int = 100):
         if not pos:
             pos = (random.randint(10, scene.tilemap.width*scene.tilemap.tile_size-10), 
                    random.randint(10, scene.tilemap.height*scene.tilemap.tile_size-10))
@@ -25,6 +29,7 @@ class Enemy(Entity):
         self.max_health = max_health
         self.health = max_health
         self.attack = attack
+        self.move_speed = move_speed
         
     def update(self, dt):
         super().update(dt)
@@ -35,6 +40,7 @@ class Enemy(Entity):
                 self.scene.EnemyList.remove(self)
             return
         self.weapon.update(dt)
+        self.move(dt);
 
     def on_death(self):
         # drop a coin on death
@@ -43,7 +49,44 @@ class Enemy(Entity):
         if not hasattr(self.scene, 'coins'):
             self.scene.coins = []
         self.scene.coins.append(coin)
+
+    def ray_hit_wall(self, tilemap, p1, p2):
+        x1, y1 = float(p1.x), float(p1.y)
+        x2, y2 = float(p2.x), float(p2.y)
+        ts = tilemap.tile_size
+
+        min_tx = int(min(x1, x2) // ts) - 1
+        max_tx = int(max(x1, x2) // ts) + 1
+        min_ty = int(min(y1, y2) // ts) - 1
+        max_ty = int(max(y1, y2) // ts) + 1
+
+        for tx in range(min_tx, max_tx + 1):
+            for ty in range(min_ty, max_ty + 1):
+                tile = tilemap.tilemap.get((tx, ty))
+                if tile and tile.type == 'physics':
+                    rect = pygame.Rect(tx * ts, ty * ts, ts, ts)
+                    clipped = rect.clipline(x1, y1, x2, y2)
+                    if clipped:  # non-empty -> intersection
+                        return True  # clipped is (cx1,cy1,cx2,cy2)
+        return False
     
+    def move(self, dt):
+        direction = (self.target.pos - self.pos); # pygame.Vector2
+        if(direction.magnitude() == 0):
+            return;
+        visible = True;
+        ray = [self.pos-self.scene.render_offset,
+                                self.target.pos-self.scene.render_offset,
+                                (255,0,0)]
+        
+        if direction.magnitude() > self.range or self.ray_hit_wall(self.scene.tilemap, ray[0], ray[1]):
+            # move towards player
+            ray[2] = (100,100,100) # change ray color if player not visible
+
+        self.scene.rays.append(ray)
+        direction = direction.normalize()
+        self.set_velocity(direction * self.move_speed)
+
     @staticmethod
     def create_wave(scene, wave_number, count = None):
         if not count:
@@ -62,6 +105,7 @@ class Enemy(Entity):
         return enemies
 
 
+    
 class CircleEnemy(Enemy):
 
     def __init__(self,scene, pos=None, max_health: int = 100, target:Entity=None, attack: int = 5):

@@ -52,7 +52,7 @@ class GameplayScene(Scene):
 
         self.wave = 1
         self.EnemyList = Enemy.create_wave(self, wave_number = self.wave, count = 3)
-        
+        self.rays = [[(10,10), (0,0), (255,0,0)]] ;
     def handle_events(self, events):
         for event in events:
             for button in self.buttons:
@@ -100,6 +100,10 @@ class GameplayScene(Scene):
         self.player.render(screen,offset=self.render_offset)
         for coin in self.coins:
             coin.render(screen,offset=self.render_offset)  # draw uncollected coins
+
+        for ray in self.rays:
+            pygame.draw.line(screen, ray[2], ray[0], ray[1], 1)
+        self.rays = [];
         for enemy in self.EnemyList:
             enemy.render(screen,offset=self.render_offset)
         text_surf = Text(f'Currency: {self.wallet.balance}    Wave: {self.wave}    Enemies  Left: {len(self.EnemyList)}',10,color='black')
