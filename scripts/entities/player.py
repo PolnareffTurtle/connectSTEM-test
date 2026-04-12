@@ -12,6 +12,8 @@ class Player(Entity):
     def __init__(self,scene,pos):
         super().__init__(scene, pos)
         self.speed = 200
+        self.base_speed = self.speed
+        self.has_shield = False
         self.max_health = 100
         self.weapon_manager = WeaponManager(self)
         self.scene = scene
@@ -49,6 +51,11 @@ class Player(Entity):
     
     def handle_event(self, event):
         self.weapon_manager.handle_event(event)
+
+    def take_damage(self, damage):
+        if not self.has_shield:
+            self.health -= damage
+        self.has_shield = False
     
     def render(self, screen, offset):
         self.weapon_manager.render_weapon_visual(screen, offset)
