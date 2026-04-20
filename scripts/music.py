@@ -42,7 +42,7 @@ class Music:
 
     @staticmethod
     def play(gamestate: GameState):
-        if gamestate == GameState.PAUSE:
+        if gamestate == GameState.PAUSE or gamestate == GameState.POWERUP_SELECTION:
             return
         Music.queue = [Music.ROOT_PATH + path for path in Music.gamestate_factory[gamestate]]
         pygame.mixer.music.load(Music.queue[0])

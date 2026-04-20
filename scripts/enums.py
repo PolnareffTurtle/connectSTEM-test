@@ -6,6 +6,7 @@ class GameState(Enum):
     PAUSE = 'pause'
     DEATH = 'death'
     OPTIONS = 'options'
+    POWERUP_SELECTION = 'powerup_select'
 
 class WeaponType(Enum):
     CIRCLE = 'circle',

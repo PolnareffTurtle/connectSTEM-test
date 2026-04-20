@@ -2,6 +2,7 @@ import pygame
 from sys import exit
 
 from scripts.scenes.options_menu_scene import OptionsMenuScene
+from scripts.scenes.powerup_selection_screen import PowerUpSelectionScreen
 from scripts.utils import load_image,load_images,spritesheet_to_surf_list
 from scripts.enums import GameState
 from scripts.scenes.gameplay_scene import GameplayScene
@@ -59,7 +60,8 @@ class Game:
             GameState.GAMEPLAY: GameplayScene,
             GameState.PAUSE: PauseScene,
             GameState.DEATH: DeathScene,
-            GameState.OPTIONS: OptionsMenuScene
+            GameState.OPTIONS: OptionsMenuScene,
+            GameState.POWERUP_SELECTION: PowerUpSelectionScreen
         }
         self.scene = None
         self.scene_stack = [] # for pause/resume
@@ -115,7 +117,8 @@ class Game:
             # if another scene was requested
             elif self.next_scene:
                 # if pausing, remember the current one
-                if isinstance(self.scene, GameplayScene) and self.next_scene == GameState.PAUSE:
+                if (isinstance(self.scene, GameplayScene) and
+                        (self.next_scene == GameState.PAUSE or self.next_scene == GameState.POWERUP_SELECTION)):
                     self.scene_stack.append(self.scene)
                 SceneType = self.scene_factories[self.next_scene]
                 self.scene = SceneType(self)

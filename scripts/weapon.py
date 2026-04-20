@@ -33,7 +33,7 @@ class Bullet(Projectile):
                 continue
 
             if self.aabb_collide(rect):
-                target.health -= self.damage
+                target.take_damage(self.damage)
                 target.health = max(0, target.health)
 
                 # Remove bullet after hit
@@ -163,7 +163,7 @@ class Weapon:
     def attack(self, user, direction=None, targets: list = None):
         targets = targets or []
         for target in targets:
-            target.health -= self.attack_power
+            target.take_damage(self.attack_power)
             target.health = max(0, target.health)
 
 class CircleWeapon(Weapon):
@@ -235,7 +235,7 @@ class RotateWeapon(Weapon):
                 now = pygame.time.get_ticks()
 
                 if now - self.last_attack > 250: # hard coded as well
-                    target.health -= self.attack_power
+                    target.take_damage(self.attack_power)
                     target.health = max(0, target.health)
                     self.last_attack = now
     def render(self, screen, user, offset=(0, 0)):
