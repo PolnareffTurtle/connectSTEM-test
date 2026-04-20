@@ -18,6 +18,7 @@ class Game:
         self.screen = pygame.display.set_mode((1280,720))
         self.display = pygame.Surface((320,180))
         self.clock = pygame.time.Clock()
+        self.load_images = load_images
         self.assets = {
             #player
             'pstand': load_images('pstand', alpha=True),
@@ -64,7 +65,7 @@ class Game:
         self.scene = None
         self.scene_stack = [] # for pause/resume
         self.next_scene = GameState.MAIN_MENU
-    
+
     @property
     def scale(self):
         return (self.screen.get_width()/self.display.get_width(), self.screen.get_height()/self.display.get_height())

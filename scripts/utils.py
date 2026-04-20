@@ -38,6 +38,62 @@ def spritesheet_to_surf_list(spritesheet, sprite_w, sprite_h, alpha=False, scale
             surf_list.append(surf)
     return surf_list
 
+
+class Animation:
+    def __init__(self, load_images_func, animations: dict[str, str], frame_duration: float = 0.12, loop: bool = True):
+        self.frame_duration = frame_duration
+        self.loop = loop
+        self.timer = 0.0
+        self.frame_index = 0
+        self.current_animation = None
+        self.animations: dict[str, list[pygame.Surface]] = {}
+
+        for name, folder in animations.items():
+            frames = load_images_func(folder)
+            if isinstance(frames, pygame.Surface):
+                frames = [frames]
+            self.animations[name] = list(frames) if frames else []
+
+        if self.animations:
+            self.current_animation = next(iter(self.animations))
+
+    def set_animation(self, name: str, reset: bool = False):
+        if name not in self.animations:
+            return
+        if self.current_animation != name or reset:
+            self.current_animation = name
+            self.frame_index = 0
+            self.timer = 0.0
+
+    def update(self, dt: float):
+        frames = self.get_current_frames()
+        if len(frames) <= 1:
+            return
+
+        self.timer += dt
+        while self.timer >= self.frame_duration:
+            self.timer -= self.frame_duration
+            self.frame_index += 1
+
+            if self.frame_index >= len(frames):
+                if self.loop:
+                    self.frame_index = 0
+                else:
+                    self.frame_index = len(frames) - 1
+
+    def get_current_frames(self) -> list[pygame.Surface]:
+        if self.current_animation is None:
+            return []
+        return self.animations.get(self.current_animation, [])
+
+    def get_current_frame(self) -> pygame.Surface | None:
+        frames = self.get_current_frames()
+        if not frames:
+            return None
+        self.frame_index = max(0, min(self.frame_index, len(frames) - 1))
+        return frames[self.frame_index]
+
+
 class Text:
     def __init__(self, text, font_size=20, font_path = 'assets/fonts/pixel.ttf', color=(255,255,255)):
         self.font = pygame.font.Font(font_path, font_size)
