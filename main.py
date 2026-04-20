@@ -46,7 +46,6 @@ class Game:
 
             # TODO: (for joseph) Fix the tiles / tile numbering of the new tiles.
             #tiles (currently renamed to tiled so that main.py can run)
-            'tiled': load_images('tiles', alpha=True), 
 
             'player': load_image('player.png',alpha=True),
             'enemy': load_image('enemy.png',alpha=True),
