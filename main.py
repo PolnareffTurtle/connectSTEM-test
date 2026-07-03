@@ -90,6 +90,7 @@ class Game:
 
             self.scene.handle_events(events)
             self.scene.update(dt)
+            self.display.fill((128, 128, 128))  # grey background
             self.scene.render(self.display)
 
             self.clock.tick(60)
