@@ -12,6 +12,7 @@ class WeaponType(Enum):
     PROJECTILE = 'projectile',
     LUNGE = 'lunge',
     ROTATE = 'rotate',
+    GUN = 'gun'
     NONE = 'none'
 
 class ItemType(Enum):

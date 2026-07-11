@@ -48,6 +48,8 @@ class Bullet(Projectile):
 
 class Weapon:
     type = None
+    # continuous weapons attack every frame regardless of mouse input
+    continuous = False
 
     def __init__(self,attack_power: int = 1,attack_speed: float = 1):
         self.attack_power = attack_power
@@ -210,6 +212,7 @@ class LungeWeapon(Weapon):
 
 class RotateWeapon(Weapon):
     type = WeaponType.ROTATE
+    continuous = True
 
     def __init__(self,attack_power,attack_speed,radius = 40,rotation_speed = 180):
         super().__init__(attack_power,attack_speed)
