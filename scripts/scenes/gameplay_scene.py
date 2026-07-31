@@ -112,7 +112,7 @@ class GameplayScene(Scene):
         # draw projectiles
         for projectile in self.projectiles:
             projectile.render(screen, offset=self.render_offset)
-        self.player.render(screen,offset=self.render_offset)
+        self.player.render(screen, offset=self.render_offset)
         for coin in self.coins:
             coin.render(screen,offset=self.render_offset)  # draw uncollected coins
         for enemy in self.EnemyList:
