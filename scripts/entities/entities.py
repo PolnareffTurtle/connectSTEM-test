@@ -10,8 +10,7 @@ class HealthBar:
         health_ratio = max(0, min(1, self.entity.health / self.entity.max_health))
         width = self.entity.size[0]
         x = int(self.entity.pos.x - width/2 - offset[0])
-        y = int(self.entity.pos.y - self.entity.size[1]/2 - 10 - offset[1])
-
+        y = int(self.entity.pos.y - self.entity.size[1] / 2 - 19 - offset[1])
         pygame.draw.rect(screen, (0, 0, 0), (x, y, width, 5))
 
         r = int(255 * (1 - health_ratio))
@@ -19,6 +18,41 @@ class HealthBar:
         b = 0
         color = (r, g, b)
         pygame.draw.rect(screen, color, (x+1, y+1, int((width-2) * health_ratio), 3))
+
+class CooldownBar:
+    def __init__(self, entity):
+        self.entity = entity
+
+    def draw(self, screen, offset):
+        # Only the player has a weapon manager
+        if not hasattr(self.entity, "weapon_manager"):
+            return
+
+        weapon = self.entity.weapon_manager.active_weapon
+
+        if weapon.attack_speed <= 0:
+            return
+
+        max_cooldown = 1 / weapon.attack_speed
+        cooldown_ratio = max(0, min(1, weapon.cooldown / max_cooldown))
+
+        width = self.entity.size[0]
+
+        x = int(self.entity.pos.x - width/2 - offset[0])
+
+        # pixels above the health bar
+        y = int(self.entity.pos.y - self.entity.size[1]/2 - 16 - offset[1])
+
+        pygame.draw.rect(screen, (0, 0, 0), (x, y, width, 5))
+
+        pygame.draw.rect(screen, (40, 40, 40), (x+1, y+1, width-2, 3))
+
+        # color of bar
+        pygame.draw.rect(
+            screen,
+            (0, 180, 255),
+            (x+1, y+1, int((width-2) * cooldown_ratio), 3)
+        )
 
 
 sign = lambda x: (x>0) - (x<0)
@@ -35,11 +69,15 @@ class Entity(Collide):
         self.max_health = 100
         self.health = self.max_health
         self.healthbar = HealthBar(self)
+        self.cooldownbar = CooldownBar(self)
 
     def render(self,screen,offset=(0,0)):
         rect = self.rect()
         screen.blit(self.image,(rect.x-offset[0],rect.y-offset[1]))
         self.healthbar.draw(screen, offset)
+        self.cooldownbar.draw(screen, offset)
+        self.healthbar = HealthBar(self)
+        self.cooldownbar = CooldownBar(self)
 
     def set_velocity(self,velocity:pygame.math.Vector2):
         self.velocity = velocity

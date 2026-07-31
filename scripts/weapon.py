@@ -59,7 +59,7 @@ class Weapon:
 
     def update(self, delta_time: float):
         if self.cooldown > 0:
-            self.cooldown -= delta_time * random.uniform(0.8,1.2)
+            self.cooldown -= delta_time
         if self.cooldown < 0:
             self.cooldown = 0
 
